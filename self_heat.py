@@ -9,7 +9,7 @@
 ## 
 ## Essential idea is to use the detonation initiation condition 
 ##  t_burn < t_cross over some length scale L to find the critical length
-##  L < (e_int / eps_nuc) c_s.
+##  L > (e_int / eps_nuc) c_s.
 ##
 ## Two figures are produced, helium_abundances.png for abundances versus
 ##  time, and detonation_lengths.png for detonation initiation length
