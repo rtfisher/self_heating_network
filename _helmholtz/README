@@ -1,0 +1,8 @@
+a simple compile and link should work.
+
+gfortran -o helmholtz.exe  helmholtz_wrapper.f90 helmholtz_library.F90 main.F90
+
+# rtf120523
+
+This hacked-up version of Frank Timmes' Helmholtz EOS takes in density, temperature (in CGS), as well as Zbar and Abar, and returns the EOS quantities separated by spaces --     pres, eint, gammac, gammae, h, cs, cp, cg (all CGS). These values can be parsed by standard Unix techniques.
+
