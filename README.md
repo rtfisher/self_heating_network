@@ -15,7 +15,9 @@
   versus time.
 
  PGO11: https://arxiv.org/abs/1106.3696
+ 
  pynucastro: https://pynucastro.github.io/pynucastro/
+
  Helmholtz: https://cococubed.com/code_pages/eos.shtml
 
  -rtf120523
