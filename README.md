@@ -1,6 +1,6 @@
 # self_heating_network
  self_heat.py is a script which does a self-heating nuclear network calculation 
- (curently assuming isochoric conditions) using pynucastro for nuclear
+ for either isochoric or isobaric conditions using pynucastro for nuclear
  reaction rates and composition, scipy.integrate for integration method,
  and the Helmholtz equation of state for specific heat. We further
  also compute the critical length for distributed nuclear burning
@@ -19,7 +19,7 @@
   
  `cd _helmholtz`
  
- `gfortran -o helmholtz.exe  helmholtz_wrapper.f90 helmholtz_library.F90 main.F90`
+ `gfortran -o helmholtz.exe  helmholtz_wrapper.f90 helmholtz_library.F90 main.F90 invert_helm_pt.f90`
 
  Then to run the script, simply cd back to the top level and run
 
@@ -30,5 +30,8 @@
  pynucastro: https://pynucastro.github.io/pynucastro/
 
  Helmholtz: https://cococubed.com/code_pages/eos.shtml
+ Helmholtz Inversion from: https://cococubed.com/code_pages/burn.shtml
 
  -rtf120523
+
+ Last update: rtf120623
