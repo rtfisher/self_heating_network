@@ -217,7 +217,7 @@ ax_right.set_ylabel('X (p)')
 plt.title(r"Isochoric Self-Heating Network with $\rho = 10^5 \, \mathrm{g\, cm}^{-3}$, $T_0 = 10^9\ $ K")
 
 # Add text box in the upper left of the figure
-text_str = r'$X(^4\mathrm{He}) = 0.8$, $X(^{12}\mathrm{C}) = 0.2$'
+text_str = r'$X(^4\mathrm{He}) = 1.0$, $X(^{12}\mathrm{C}) = 0$'
 plt.text(0.05, 0.95, text_str, transform=plt.gca().transAxes, fontsize=10,
          verticalalignment='top', bbox=dict(boxstyle='round,pad=0.5', facecolor='white', edgecolor='black'))
 
