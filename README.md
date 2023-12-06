@@ -1,4 +1,4 @@
-# self_heating_network
+# Self Heating Network
  self_heat.py is a script which does a self-heating nuclear network calculation 
  for either isochoric or isobaric conditions using pynucastro for nuclear
  reaction rates and composition, scipy.integrate for integration method,
