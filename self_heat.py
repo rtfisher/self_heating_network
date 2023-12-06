@@ -31,7 +31,8 @@ from scipy.integrate import solve_ivp
 from mpl_toolkits.axes_grid1.inset_locator import inset_axes
 import aux # auxilliary module for additional code
 
-# Set run mode to either constant pressure (isobaric) or volume (isochoric)
+# Set run mode to either constant pressure (isobaric) or volume (isochoric) --
+#  for isobaric set invert to True, for isochoric set invert to False
 invert = True
 
 # Get the initial time
@@ -79,7 +80,7 @@ T = 1.e9   # K
 
 # For isobaric conditions, define a constant pressure.
 if invert:
-    pres =  8.8535905097400357E+021 # dyne/cm^2 for pure He at rho5 = 1, T9 = 1
+    pres =  8.85359E+021 # dyne/cm^2 for pure He at rho5 = 1, T9 = 1
 
 # Define initial abundances and initialize pyna Composition object
 xhe4_init = 1.0
