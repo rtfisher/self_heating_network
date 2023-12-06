@@ -91,11 +91,6 @@ comp.set_all (0.)
 comp.set_nuc ("he4", xhe4_init)
 comp.set_nuc ("c12", xc12_init)
 
-abar = comp.eval_abar()
-zbar = comp.eval_zbar()
-
-print ("abar, zbar = ", abar, " ", zbar)
-
 # Also define a numpy array of mass and molar initial abundances X0 and Y0
 X0 = np.zeros (helium_network.nnuc)
 X0 [helium_network.jhe4] = 1.0
@@ -146,7 +141,8 @@ while t < tmax:
 # Make sure to include pressure here
 
     # Call to the EOS, include T/F flag invert to determine whether we call the EOS
-    #  as rho/T mode or T/P mode as an inversion
+    #  as rho/T mode or T/P mode as an inversion. For isobaric calls, the rho
+    #  value is taken as an initial guess
     dens, pres, eint, gammac, gammae, h, cs, cp, cv = aux.call_helmholtz (invert, rho, T, abar, zbar, pres)
 
     if not (invert):
