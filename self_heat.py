@@ -31,9 +31,16 @@ from scipy.integrate import solve_ivp
 from mpl_toolkits.axes_grid1.inset_locator import inset_axes
 import aux # auxilliary module for additional code
 
+# Set run mode to either constant pressure (isobaric) or volume (isochoric)
+invert = True
+
 # Get the initial time
 initial_time = datetime.datetime.now()
 print("Begin run :", initial_time.strftime("%B %d, %Y, %H:%M:%S"))
+if invert:
+  print("Isobaric run")
+else:
+  print("Isochoric run")
 
 library = pyna.ReacLibLibrary()
 # Define a minimal set of isotopes for a rapid He burn
@@ -70,6 +77,10 @@ isotope_map = {
 rho = 1.e5 # g/cm^3
 T = 1.e9   # K
 
+# For isobaric conditions, define a constant pressure.
+if invert:
+    pres =  8.8535905097400357E+021 # dyne/cm^2 for pure He at rho5 = 1, T9 = 1
+
 # Define initial abundances and initialize pyna Composition object
 xhe4_init = 1.0
 xc12_init = 0.0
@@ -78,6 +89,11 @@ comp = pyna.Composition(rc.get_nuclei())
 comp.set_all (0.)
 comp.set_nuc ("he4", xhe4_init)
 comp.set_nuc ("c12", xc12_init)
+
+abar = comp.eval_abar()
+zbar = comp.eval_zbar()
+
+print ("abar, zbar = ", abar, " ", zbar)
 
 # Also define a numpy array of mass and molar initial abundances X0 and Y0
 X0 = np.zeros (helium_network.nnuc)
@@ -103,9 +119,9 @@ while t < tmax:
     T_initial = T
 
     # Integrate the ODE system forward  to t + dt
-    sol = solve_ivp(helium_network.rhs, [t, t + dt], Y0, method="BDF",
-                    jac=helium_network.jacobian, dense_output=True,
-                    args=(rho, T), rtol=1.e-6, atol=1.e-6)
+    sol = solve_ivp (helium_network.rhs, [t, t + dt], Y0, method="BDF",
+                     jac=helium_network.jacobian, dense_output=True,
+                     args=(rho, T), rtol=1.e-6, atol=1.e-6)
 
     # Append the latest timestep data to solutions
     solutions.append(sol.y[:, -1])
@@ -118,19 +134,27 @@ while t < tmax:
 
 # Make sure to include neutrino losses here
 
-    # Update mass composition X = Y / A
+    # Update mass composition X = Y * A
     for isotope, index in isotope_map.items():
-       comp.set_nuc(isotope, sol.y [index, n] / helium_network.A [index])
+       comp.set_nuc(isotope, sol.y [index, n] * helium_network.A [index])
 
     # Update abar and zbar
     abar = comp.eval_abar()
     zbar = comp.eval_zbar()
 
-    # Call to the EOS
-    pres, eint, gammac, gammae, h, cs, cp, cv = aux.call_helmholtz(rho, T, abar, zbar)
+# Make sure to include pressure here
 
+    # Call to the EOS, include T/F flag invert to determine whether we call the EOS
+    #  as rho/T mode or T/P mode as an inversion
+    dens, pres, eint, gammac, gammae, h, cs, cp, cv = aux.call_helmholtz (invert, rho, T, abar, zbar, pres)
+
+    if not (invert):
     # Calculate temperature increment for isochoric network using cv
-    dT = de_nuc / cv
+      dT = de_nuc / cv
+    else:
+      dT = de_nuc / cp #isobaric with cp
+      rho = dens       #update density from EOS call
+
     T += dT
 
     # Calculate time derivative of molar abundances dYdt
