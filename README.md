@@ -6,7 +6,7 @@
  also compute the critical length for distributed nuclear burning
  using Poloudnenko, Gardiner, & Oran's 2011 PRL condition.
  
- Essential idea is to use the detonation initiation condition 
+ The essential idea is to use the detonation initiation condition 
  t_burn < t_cross over some length scale L to find the critical length
  L > (e_int / eps_nuc) c_s.
 
