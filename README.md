@@ -13,7 +13,7 @@
  We furter compute the critical length for distributed nuclear burning
  using Poloudnenko, Gardiner, & Oran's 2011 PRL condition. The essential idea
  for this determination is to use the detonation initiation condition 
- that the burning timescale is less than the sond-crossing time;
+ that the burning timescale is less than the sound-crossing time;
  t_burn < t_cross over some length scale L to find the critical length
  L > (e_int / eps_nuc) c_s. Here e_int is the specific internal energy,
  eps_nuc is the specific nuclear energy generation rate, and c_s is the 
