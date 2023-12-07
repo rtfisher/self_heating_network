@@ -5,7 +5,10 @@
  and the Helmholtz equation of state for specific heat. A version of the 
  Helmholtz equation of state which is called as a function of pressure and
  temperature as well as Abar and Zbar and returns density which is included
- is adapted from Frank Timmmes' Torch code.
+ is adapted from Frank Timmmes' Torch code. The Helmholtz calls are handled
+ by a custom Fortran wrapper around Helmholtz; the stdout from this wrapper
+ contains the key EOS outputs, which are parsed by the function call_helmholtz
+ in the aux.py module, using subprocess.
  
  We furter compute the critical length for distributed nuclear burning
  using Poloudnenko, Gardiner, & Oran's 2011 PRL condition. The essential idea
