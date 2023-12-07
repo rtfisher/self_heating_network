@@ -4,11 +4,11 @@
  reaction rates and composition, scipy.integrate for integration method,
  and the Helmholtz equation of state for specific heat. A variation of the 
  Helmholtz equation of state is called as a function of pressure and
- temperature, Abar, and Zbar and returns density, and         
- is adapted from Frank Timmmes' Torch code. The Helmholtz calls are handled
- by a custom Fortran wrapper around Helmholtz; the stdout from this wrapper
- contains the key EOS outputs, which are parsed by the function call_helmholtz
- in the aux.py module, using subprocess.
+ temperature, Abar, and Zbar and returns density, and is adapted from Frank 
+ Timmmes' Torch code. The Helmholtz calls are handled by a custom Fortran
+ wrapper around Helmholtz; the stdout from this wrapper contains the key EOS 
+ outputs, which are parsed by the function call_helmholtz in the aux.py
+ module, using subprocess.
  
  We furter compute the critical length for distributed nuclear burning
  using Poloudnenko, Gardiner, & Oran's 2011 PRL condition. The essential idea
