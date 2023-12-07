@@ -25,6 +25,7 @@
 
 import datetime
 import pynucastro as pyna
+from pynucastro.neutrino_cooling import sneut5
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy.integrate import solve_ivp
@@ -33,7 +34,7 @@ import aux # auxilliary module for additional code
 
 # Set run mode to either constant pressure (isobaric) or volume (isochoric) --
 #  for isobaric set invert to True, for isochoric set invert to False
-invert = True
+invert = False
 
 # Get the initial time
 initial_time = datetime.datetime.now()
@@ -76,22 +77,23 @@ isotope_map = {
 
 # Defne initial density and temperature. For isochoric conditions, rho = const.
 rho = 1.e5 # g/cm^3
-T = 1.e9   # K
+T_init = T = 1.e9   # K
 
-# For isobaric conditions, define a constant pressure.
-if invert:
-    pres =  8.85359E+021 # dyne/cm^2 for pure He at rho5 = 1, T9 = 1
+# For isobaric conditions, define a constant pressure.  We define it as well
+#  for isochoric conditions for use in the initial Helmholtz call below, but
+#  it is not used.
+pres =  8.85359E+021 # dyne/cm^2 for pure He at rho5 = 1, T9 = 1
 
 # Define initial abundances and initialize pyna Composition object
-xhe4_init = 1.0
-xc12_init = 0.0
+xhe4_init = 0.8
+xc12_init = 0.2
 
 comp = pyna.Composition(rc.get_nuclei())
 comp.set_all (0.)
 comp.set_nuc ("he4", xhe4_init)
 comp.set_nuc ("c12", xc12_init)
 
-# Also define a numpy array of mass and molar initial abundances X0 and Y0
+# Also define a numpy array of mass and number initial abundances X0 and Y0
 X0 = np.zeros (helium_network.nnuc)
 X0 [helium_network.jhe4] = 1.0
 X0 [helium_network.jc12] = 0.
@@ -123,12 +125,10 @@ while t < tmax:
     solutions.append(sol.y[:, -1])
     times.append (t)
 
-    # Compute the energy increase
+    # Compute the specific nuclear energy increase
     n = sol.y.shape[1] - 1
     dY = sol.y[:, n] - Y0_initial [:]   # Y difference over timestep
     de_nuc = helium_network.energy_release(dY)
-
-# Make sure to include neutrino losses here
 
     # Update mass composition X = Y * A
     for isotope, index in isotope_map.items():
@@ -138,23 +138,24 @@ while t < tmax:
     abar = comp.eval_abar()
     zbar = comp.eval_zbar()
 
-# Make sure to include pressure here
+# Calculate the specific neutrino loss rate
+    snu = sneut5 (rho, T, comp) # erg / g / s
 
     # Call to the EOS, include T/F flag invert to determine whether we call the EOS
-    #  as rho/T mode or T/P mode as an inversion. For isobaric calls, the rho
-    #  value is taken as an initial guess
+    #  as rho/T mode or T/P mode as an inversion, respectgively. For isobaric calls,
+    #  the rho value is taken as an initial guess
     dens, pres, eint, gammac, gammae, h, cs, cp, cv = aux.call_helmholtz (invert, rho, T, abar, zbar, pres)
 
     if not (invert):
-    # Calculate temperature increment for isochoric network using cv
-      dT = de_nuc / cv
+    # Calculate temperature increment for isochoric network using specifc heat cv
+      dT = (de_nuc - snu * dt) / cv
     else:
-      dT = de_nuc / cp #isobaric with cp
+      dT = (de_nuc - snu * dt) / cp # isobaric with specific heat cp
       rho = dens       #update density from EOS call
 
     T += dT
 
-    # Calculate time derivative of molar abundances dYdt
+    # Calculate time derivative of number abundances dYdt
     dYdt = dY / dt
 
     # Calculate critical length and append to list
@@ -199,12 +200,16 @@ energies_array = np.array  (energies)
 
 fig = plt.figure()
 ax = fig.add_subplot(111)
-#ax.set_xlim(1.e10, 1.e20)
 ax.set_ylim(1.e-8, 1.0)
 
 # Iterate over isotopes, converting betweeen Y and X by multiplying by A
 for i in species:
     ax.loglog(times_array, solutions_array [i,:] * helium_network.A[i], label=f"X({helium_network.names[i].capitalize()})")
+
+if (invert):
+    plt.title(fr"Isobaric Self-Heating Network, $P = {aux.float_to_latex_scientific(pres)}\, \mathrm{{dyne}}\ \mathrm{{cm}}^{{-2}}$, $T_0 = {aux.float_to_latex_scientific(T_init)}\ $ K") # using f strings
+else:
+    plt.title(fr"Isochoric Self-Heating Network, $\rho = {aux.float_to_latex_scientific(rho)}\, \mathrm{{g}}\ \mathrm{{cm}}^{{-3}}$, $T_0 = {aux.float_to_latex_scientific(T_init)}\ $ K")
 
 # Set legend location. Other options include 'upper right', 'lower left', 'best', etc.
 ax.legend(loc='upper right')
@@ -235,10 +240,15 @@ ax_right.set_yscale('log')
 ax_right.set_ylim(1.e-8, 1.e-4)
 ax_right.set_ylabel('X (p)')
 
-plt.title(r"Isochoric Self-Heating Network with $\rho = 10^5 \, \mathrm{g\, cm}^{-3}$, $T_0 = 10^9\ $ K")
+if (invert):
+    plt.title(fr"Isobaric Self-Heating with $P = {aux.float_to_latex_scientific(pres)}\, \mathrm{{dyne}}\ \mathrm{{cm}}^{{-2}}$, $T_0 = {aux.float_to_latex_scientific(T_init)}\ $ K") # using f strings
+else:
+    plt.title(fr"Isochoric Self-Heating with $\rho = {aux.float_to_latex_scientific(rho)}\, \mathrm{{g}}\ \mathrm{{cm}}^{{-3}}$, $T_0 = {aux.float_to_latex_scientific(T_init)}\ $ K") 
 
 # Add text box in the upper left of the figure
-text_str = r'$X(^4\mathrm{He}) = 1.0$, $X(^{12}\mathrm{C}) = 0$'
+#text_str = r'$X(^4\mathrm{He}) = 1.0$, $X(^{12}\mathrm{C}) = 0$'
+text_str = fr'$X(^4\mathrm{{He}}) = {aux.float_to_latex_scientific(xhe4_init)}$, $X(^{{12}}\mathrm{{C}}) = {aux.float_to_latex_scientific(xc12_init)}$'
+
 plt.text(0.05, 0.95, text_str, transform=plt.gca().transAxes, fontsize=10,
          verticalalignment='top', bbox=dict(boxstyle='round,pad=0.5', facecolor='white', edgecolor='black'))
 
@@ -262,4 +272,4 @@ fig.savefig("detonation_lengths.png")
 final_time = datetime.datetime.now()
 time_difference = final_time - initial_time
 print("End run:", final_time.strftime("%B %d, %Y, %H:%M:%S"))
-print("Time difference in seconds:", time_difference.total_seconds())
+print("Total run time (seconds):", time_difference.total_seconds())
