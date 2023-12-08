@@ -24,6 +24,7 @@
 ############################################################################
 
 import datetime
+import argparse
 import pynucastro as pyna
 from pynucastro.neutrino_cooling import sneut5
 import matplotlib.pyplot as plt
@@ -34,21 +35,66 @@ import aux # auxilliary module for additional code
 
 # Set run mode to either constant pressure (isobaric) or volume (isochoric) --
 #  for isobaric set invert to True, for isochoric set invert to False
-invert = False
+#invert = True
 
 # Get the initial time
 initial_time = datetime.datetime.now()
 print("Begin run :", initial_time.strftime("%B %d, %Y, %H:%M:%S"))
+
+parser = argparse.ArgumentParser(description="Nuclear reaction network script.")
+
+ # Add mutually exclusive group for --isobaric and --isochoric
+group = parser.add_mutually_exclusive_group()
+group.add_argument('--isobaric', action='store_true', help='Set invert to True for isobaric conditions.')
+group.add_argument('--isochoric', action='store_false', help='Set invert to False for isochoric conditions.')
+
+# Add arguments for initial density and temperature
+parser.add_argument('-rho', type=float, default=1.e5, help='Initial mass density in g/cm^3.')
+parser.add_argument('-T', type=float, default=1.e9, help='Initial temperature in Kelvin.')
+
+# Add arguments for initial abundances
+parser.add_argument('-xhe4', type=float, default=0.8, help='Initial abundance of He4.')
+parser.add_argument('-xc12', type=float, default=0.1, help='Initial abundance of C12.')
+parser.add_argument('-xo16', type=float, default=0.1, help='Initial abundance of O16.')
+
+# Parse the arguments
+args = parser.parse_args()
+
+# Set the invert variable based on the arguments
+if args.isobaric:
+    invert = True
+elif args.isochoric:
+    invert = False
+else:
+    # Default behavior if neither isobaric nor isochoric is specified
+    invert = None
+
 if invert:
   print("Isobaric run")
 else:
   print("Isochoric run")
 
+# Defne initial density and temperature. For isochoric conditions, rho = const.
+rho = args.rho # g/cm^3
+T_init = T = args.T  # K
+
+# Define initial abundances and initialize pyna Composition object
+xhe4_init = args.xhe4
+xc12_init = args.xc12
+xo16_init = args.xo16
+
 library = pyna.ReacLibLibrary()
-# Define a minimal set of isotopes for a rapid He burn
-sub = library.linking_nuclei(["p", "n", "he4", "c12", "n13", "n14", "o16",
-                              "ne20", "ne21", "na23", "mg23", "mg24", "al27",
-                              "si27", "si28"])
+sub = library.linking_nuclei(["p", "n", "he4", "b11", "c12", "c13", "n13", "n14",
+                              "n15", "o15", "o16", "o17", "f18", "ne19",
+                              "ne20", "ne21", "ne22", "na22", "na23", "mg23", "mg24", 
+                              "mg25", "mg26", "al25", "al26", "al27", "si28", "si29",
+                              "si30", "p29", "p30", "p31", "s31",
+                              "s32", "s33", "cl33", "cl34", "cl35", "ar36", "ar37",
+                              "ar38", "ar39", "k39", "ca40",
+                              "sc43", "ti44", "v47", 
+                              "cr48", "mn51", "fe52", "fe55", "co55", "ni56",
+                              "ni58", "ni59"])
+
 rc = pyna.RateCollection(libraries=sub) # Using Reaclib
 pynet = pyna.PythonNetwork (libraries=sub)
 
@@ -56,48 +102,90 @@ pynet = pyna.PythonNetwork (libraries=sub)
 pynet.write_network ("helium_network.py")
 import helium_network as helium_network
 
-# Mapping of isotopes to indices in the helium_network object
 isotope_map = {
     'p': helium_network.jp,
     'n': helium_network.jn,
     'he4': helium_network.jhe4,
+    'b11': helium_network.jb11,
     'c12': helium_network.jc12,
+    'c13': helium_network.jc13,
     'n13': helium_network.jn13,
     'n14': helium_network.jn14,
+    'n15': helium_network.jn15,
+    'o15': helium_network.jo15,
     'o16': helium_network.jo16,
+    'o17': helium_network.jo17,
+    'f18': helium_network.jf18,
+    'ne19': helium_network.jne19,
     'ne20': helium_network.jne20,
     'ne21': helium_network.jne21,
+    'ne22': helium_network.jne22,
+    'na22': helium_network.jna22,
     'na23': helium_network.jna23,
     'mg23': helium_network.jmg23,
     'mg24': helium_network.jmg24,
+    'mg25': helium_network.jmg25,
+    'mg26': helium_network.jmg26,
+    'al25': helium_network.jal25,
+    'al26': helium_network.jal26,
     'al27': helium_network.jal27,
-    'si27': helium_network.jsi27,
-    'si28': helium_network.jsi28
+    'si28': helium_network.jsi28,
+    'si29': helium_network.jsi29,
+    'si30': helium_network.jsi30,
+    'p29': helium_network.jp29,
+    'p30': helium_network.jp30,
+    'p31': helium_network.jp31,
+    's31': helium_network.js31,
+    's32': helium_network.js32,
+    's33': helium_network.js33,
+    'cl33': helium_network.jcl33,
+    'cl34': helium_network.jcl34,
+    'cl35': helium_network.jcl35,
+    'ar36': helium_network.jar36,
+    'ar37': helium_network.jar37,
+    'ar38': helium_network.jar38,
+    'ar39': helium_network.jar39,
+    'k39': helium_network.jk39,
+    'ca40': helium_network.jca40,
+    'sc43': helium_network.jsc43,
+    'ti44': helium_network.jti44,
+    'v47': helium_network.jv47,
+    'cr48': helium_network.jcr48,
+    'mn51': helium_network.jmn51,
+    'fe52': helium_network.jfe52,
+    'fe55': helium_network.jfe55,
+    'co55': helium_network.jco55,
+    'ni56': helium_network.jni56,
+    'ni58': helium_network.jni58,
+    'ni59': helium_network.jni59
 }
 
-# Defne initial density and temperature. For isochoric conditions, rho = const.
-rho = 1.e5 # g/cm^3
-T_init = T = 1.e9   # K
-
-# For isobaric conditions, define a constant pressure.  We define it as well
-#  for isochoric conditions for use in the initial Helmholtz call below, but
-#  it is not used.
-pres =  8.85359E+021 # dyne/cm^2 for pure He at rho5 = 1, T9 = 1
-
-# Define initial abundances and initialize pyna Composition object
-xhe4_init = 0.8
-xc12_init = 0.2
-
+# Set compositin.
 comp = pyna.Composition(rc.get_nuclei())
 comp.set_all (0.)
 comp.set_nuc ("he4", xhe4_init)
 comp.set_nuc ("c12", xc12_init)
+comp.set_nuc ("o16", xo16_init)
 
 # Also define a numpy array of mass and number initial abundances X0 and Y0
 X0 = np.zeros (helium_network.nnuc)
-X0 [helium_network.jhe4] = 1.0
-X0 [helium_network.jc12] = 0.
+X0 [helium_network.jhe4] = xhe4_init
+X0 [helium_network.jc12] = xc12_init
+X0 [helium_network.jo16] = xo16_init
 Y0 = X0 / helium_network.A
+
+# Calculate abar and zbar
+abar = comp.eval_abar()
+zbar = comp.eval_zbar()
+
+# For isobaric conditions, define a constant pressure by an initial call to Helmholtz
+#  using the initial density and temperature and composition.
+pres = 0. # initialize
+if (invert):
+    first_invert = False
+    dens, pres, eint, gammac, gammae, h, cs, cp, cv = aux.call_helmholtz (first_invert, rho, T, abar, zbar, pres)
+#pres =  8.85359E+021 # dyne/cm^2 for pure He at rho5 = 1, T9 = 1
+
 
 # Set limits of time integration and initial timestep dt
 t    = 0.
@@ -132,7 +220,7 @@ while t < tmax:
 
     # Update mass composition X = Y * A
     for isotope, index in isotope_map.items():
-       comp.set_nuc(isotope, sol.y [index, n] * helium_network.A [index])
+        comp.set_nuc(isotope, sol.y [index, n] * helium_network.A [index])
 
     # Update abar and zbar
     abar = comp.eval_abar()
@@ -192,7 +280,7 @@ ax.set_xlabel("t (s)")
 ax.set_ylabel("X")
 
 # Isotopes to plot
-species = [helium_network.jp, helium_network.jhe4, helium_network.jc12, helium_network.jo16, helium_network.jne20, helium_network.jne21, helium_network.jna23, helium_network.jmg24, helium_network.jal27, helium_network.jsi27, helium_network.jsi28]
+species = [helium_network.jp, helium_network.jhe4, helium_network.jc12, helium_network.jo16, helium_network.jne20, helium_network.jne21, helium_network.jna23, helium_network.jmg24, helium_network.jal27,  helium_network.jsi28, helium_network.js32,  helium_network.jar36,  helium_network.jca40]
 
 solutions_array = np.array(solutions).T  # Transpose to match the expected shape
 times_array = np.array  (times)
@@ -247,7 +335,7 @@ else:
 
 # Add text box in the upper left of the figure
 #text_str = r'$X(^4\mathrm{He}) = 1.0$, $X(^{12}\mathrm{C}) = 0$'
-text_str = fr'$X(^4\mathrm{{He}}) = {aux.float_to_latex_scientific(xhe4_init)}$, $X(^{{12}}\mathrm{{C}}) = {aux.float_to_latex_scientific(xc12_init)}$'
+text_str = fr'$X(^4\mathrm{{He}}) = {aux.float_to_latex_scientific(xhe4_init)}$, $X(^{{12}}\mathrm{{C}}) = {aux.float_to_latex_scientific(xc12_init)}$, $X(^{{16}}\mathrm{{O}}) = {aux.float_to_latex_scientific(xo16_init)}$'
 
 plt.text(0.05, 0.95, text_str, transform=plt.gca().transAxes, fontsize=10,
          verticalalignment='top', bbox=dict(boxstyle='round,pad=0.5', facecolor='white', edgecolor='black'))
