@@ -79,9 +79,15 @@ rho = args.rho # g/cm^3
 T_init = T = args.T  # K
 
 # Define initial abundances and initialize pyna Composition object
-xhe4_init = args.xhe4
-xc12_init = args.xc12
-xo16_init = args.xo16
+norm = args.xhe4 + args.xc12 + args.xo16
+
+if (norm == 1):
+  xhe4_init = args.xhe4
+  xc12_init = args.xc12
+  xo16_init = args.xo16
+else:
+  print (f"Error: initial abundances ({args.xhe4} + {args.xc12} + {args.xo16} = {norm}) must add to unity.")
+  exit (1)
 
 library = pyna.ReacLibLibrary()
 sub = library.linking_nuclei(["p", "n", "he4", "b11", "c12", "c13", "n13", "n14",
