@@ -86,7 +86,7 @@ if (norm == 1):
   xc12_init = args.xc12
   xo16_init = args.xo16
 else:
-  print (f"Error: initial abundances ({args.xhe4} + {args.xc12} + {args.xo16} = {norm}) must add to unity.")
+  print (f"Error: initial abundances ('{args.xhe4}' + '{args.xc12}' + '{args.xo16}' = '{norm}') must add to unity.")
   exit (1)
 
 library = pyna.ReacLibLibrary()
@@ -196,7 +196,9 @@ if (invert):
 # Set limits of time integration and initial timestep dt
 t    = 0.
 dt   = 1.e-3
-tmax = 10.
+dt_plot = 0.1  # Plot at every dt_plot interval
+accumulated_time = 0  # Initialize an accumulated time counter
+tmax = 10.0
 
 # Initialize lists for data storage
 times = []
@@ -240,11 +242,24 @@ while t < tmax:
     #  the rho value is taken as an initial guess
     dens, pres, eint, gammac, gammae, h, cs, cp, cv = aux.call_helmholtz (invert, rho, T, abar, zbar, pres)
 
+    # include a turbulent heating term
+#    eturb = 5.e16 # erg / g/ s
+    eturb = 0.
+
+    # Check if the accumulated time has reached or exceeded dt_plot
+    if accumulated_time >= dt_plot:
+        print(f"Plotting at time {t}")
+        fig = rc.plot(rho=dens, T=T, comp=comp, ydot_cutoff_value=1.e-5, curved_edges=True, rotated=True, node_size=800, node_font_size=14, size=(3200, 2400) )
+        formatted_time = "{:.2f}".format(t)  # Format to 2 decimal places
+        fig.savefig (f"reaction_flow_{formatted_time}.png")
+        # Reset the accumulated time
+        accumulated_time -= dt_plot
+
     if not (invert):
     # Calculate temperature increment for isochoric network using specifc heat cv
-      dT = (de_nuc - snu * dt) / cv
+      dT = (de_nuc + (eturb - snu) * dt) / cv
     else:
-      dT = (de_nuc - snu * dt) / cp # isobaric with specific heat cp
+      dT = (de_nuc + (eturb - snu) * dt) / cp # isobaric with specific heat cp
       rho = dens       #update density from EOS call
 
     T += dT
@@ -273,6 +288,9 @@ while t < tmax:
     # Check if the next step exceeds tmax
     if t + dt > tmax:
         dt = tmax - t
+
+    accumulated_time += dt
+
 # end while
 
 ########################
