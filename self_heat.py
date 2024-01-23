@@ -90,7 +90,7 @@ else:
   exit (1)
 
 library = pyna.ReacLibLibrary()
-sub = library.linking_nuclei(["p", "n", "he4", "b11", "c12", "c13", "n13", "n14",
+isotope_list = ["p", "n", "he4", "b11", "c12", "c13", "n13", "n14",
                               "n15", "o15", "o16", "o17", "f18", "ne19",
                               "ne20", "ne21", "ne22", "na22", "na23", "mg23", "mg24", 
                               "mg25", "mg26", "al25", "al26", "al27", "si28", "si29",
@@ -99,15 +99,29 @@ sub = library.linking_nuclei(["p", "n", "he4", "b11", "c12", "c13", "n13", "n14"
                               "ar38", "ar39", "k39", "ca40",
                               "sc43", "ti44", "v47", 
                               "cr48", "mn51", "fe52", "fe55", "co55", "ni56",
-                              "ni58", "ni59"])
+                              "ni58", "ni59",
+                              "si26", "s30", "ar34"  # added for alpha-p process
+                              ]
 
-rc = pyna.RateCollection(libraries=sub) # Using Reaclib
-pynet = pyna.PythonNetwork (libraries=sub)
+linking_isotopes = library.linking_nuclei( isotope_list)
+
+rc = pyna.RateCollection(libraries=linking_isotopes) # Using Reaclib
+pynet = pyna.PythonNetwork (libraries=linking_isotopes)
 
 # Write out the network and import it back in
 pynet.write_network ("helium_network.py")
 import helium_network as helium_network
 
+# Auo-generate a map of isotope names to indices in the network
+isotope_map = {}
+for isotope in isotope_list:
+    attribute_name = 'j' + isotope
+    if hasattr(helium_network, attribute_name):
+        isotope_map[isotope] = getattr(helium_network, attribute_name)
+    else:
+        print(f"Attribute {attribute_name} not found in helium_network")
+
+""" Hardcoded isotope map, not used
 isotope_map = {
     'p': helium_network.jp,
     'n': helium_network.jn,
@@ -135,18 +149,21 @@ isotope_map = {
     'al25': helium_network.jal25,
     'al26': helium_network.jal26,
     'al27': helium_network.jal27,
+    'si26': helium_network.jsi26, # added for alpha-p process
     'si28': helium_network.jsi28,
     'si29': helium_network.jsi29,
     'si30': helium_network.jsi30,
     'p29': helium_network.jp29,
     'p30': helium_network.jp30,
     'p31': helium_network.jp31,
+    's30': helium_network.js30,
     's31': helium_network.js31,
     's32': helium_network.js32,
     's33': helium_network.js33,
     'cl33': helium_network.jcl33,
     'cl34': helium_network.jcl34,
     'cl35': helium_network.jcl35,
+    'ar34': helium_network.jar34,
     'ar36': helium_network.jar36,
     'ar37': helium_network.jar37,
     'ar38': helium_network.jar38,
@@ -165,6 +182,7 @@ isotope_map = {
     'ni58': helium_network.jni58,
     'ni59': helium_network.jni59
 }
+"""
 
 # Set compositin.
 comp = pyna.Composition(rc.get_nuclei())
@@ -195,10 +213,10 @@ if (invert):
 
 # Set limits of time integration and initial timestep dt
 t    = 0.
-dt   = 1.e-3
+dt   = 1.e-4
 dt_plot = 0.1  # Plot at every dt_plot interval
 accumulated_time = 0  # Initialize an accumulated time counter
-tmax = 10.0
+tmax = 1.  
 
 # Initialize lists for data storage
 times = []
@@ -249,9 +267,10 @@ while t < tmax:
     # Check if the accumulated time has reached or exceeded dt_plot
     if accumulated_time >= dt_plot:
         print(f"Plotting at time {t}")
-        fig = rc.plot(rho=dens, T=T, comp=comp, ydot_cutoff_value=1.e-5, curved_edges=True, rotated=True, node_size=800, node_font_size=14, size=(3200, 2400) )
+        fig = rc.plot(rho=dens, T=T, comp=comp, ydot_cutoff_value=1.e-3, curved_edges=False, rotated=False, node_size=800, node_font_size=14, size=(3200, 2400), hide_xalpha=True)
         formatted_time = "{:.2f}".format(t)  # Format to 2 decimal places
         fig.savefig (f"reaction_flow_{formatted_time}.png")
+        fig.clf()
         # Reset the accumulated time
         accumulated_time -= dt_plot
 
