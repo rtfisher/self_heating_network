@@ -45,8 +45,8 @@ parser = argparse.ArgumentParser(description="Nuclear reaction network script.")
 
  # Add mutually exclusive group for --isobaric and --isochoric
 group = parser.add_mutually_exclusive_group()
-group.add_argument('--isobaric', action='store_true', help='Set invert to True for isobaric conditions.')
-group.add_argument('--isochoric', action='store_false', help='Set invert to False for isochoric conditions.')
+group.add_argument('--isobaric', action='store_true', help='Use isobaric conditions, with pressure set by initial density, temperature, and composition..')
+group.add_argument('--isochoric', action='store_false', help='Use isochoric conditions established by initial density.')
 
 # Add arguments for initial density and temperature
 parser.add_argument('-rho', type=float, default=1.e5, help='Initial mass density in g/cm^3.')
