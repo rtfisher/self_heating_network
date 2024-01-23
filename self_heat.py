@@ -33,10 +33,6 @@ from scipy.integrate import solve_ivp
 from mpl_toolkits.axes_grid1.inset_locator import inset_axes
 import aux # auxilliary module for additional code
 
-# Set run mode to either constant pressure (isobaric) or volume (isochoric) --
-#  for isobaric set invert to True, for isochoric set invert to False
-#invert = True
-
 # Get the initial time
 initial_time = datetime.datetime.now()
 print("Begin run :", initial_time.strftime("%B %d, %Y, %H:%M:%S"))
