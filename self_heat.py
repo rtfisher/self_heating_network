@@ -57,6 +57,9 @@ parser.add_argument('-xhe4', type=float, default=0.8, help='Initial abundance of
 parser.add_argument('-xc12', type=float, default=0.1, help='Initial abundance of C12.')
 parser.add_argument('-xo16', type=float, default=0.1, help='Initial abundance of O16.')
 
+#Add argument for run duration.
+parser.add_argument('-tmax', type=float, default=0.1, help='Simulation evolutionary time (in seconds).')
+
 # Parse the arguments
 args = parser.parse_args()
 
@@ -210,13 +213,12 @@ if (invert):
     dens, pres, eint, gammac, gammae, h, cs, cp, cv = aux.call_helmholtz (first_invert, rho, T, abar, zbar, pres)
 #pres =  8.85359E+021 # dyne/cm^2 for pure He at rho5 = 1, T9 = 1
 
-
 # Set limits of time integration and initial timestep dt
 t    = 0.
-dt   = 1.e-4
-dt_plot = 0.1  # Plot at every dt_plot interval
 accumulated_time = 0  # Initialize an accumulated time counter
-tmax = 1.  
+tmax = args.tmax  
+dt   = 1.e-3 * tmax # Initial timestep, scaled by tmax
+dt_plot = tmax / 10  # Plot at every dt_plot interval, scaled by tmax
 
 # Initialize lists for data storage
 times = []
