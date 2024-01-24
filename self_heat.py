@@ -41,7 +41,7 @@ parser = argparse.ArgumentParser(description="Nuclear reaction network script.")
 
  # Add mutually exclusive group for --isobaric and --isochoric
 group = parser.add_mutually_exclusive_group()
-group.add_argument('--isobaric', action='store_true', help='Use isobaric conditions, with pressure set by initial density, temperature, and composition..')
+group.add_argument('--isobaric', action='store_true', help='Use isobaric conditions, with pressure set by initial density, temperature, and composition.')
 group.add_argument('--isochoric', action='store_false', help='Use isochoric conditions established by initial density.')
 
 # Add arguments for initial density and temperature
@@ -277,7 +277,7 @@ while t < tmax:
       dT = (de_nuc + (eturb - snu) * dt) / cv
     else:
       dT = (de_nuc + (eturb - snu) * dt) / cp # isobaric with specific heat cp
-      rho = dens       #update density from EOS call
+#      rho = dens       #update density from EOS call
 
     T += dT
 
@@ -294,7 +294,11 @@ while t < tmax:
         dt /= 2.0
         Y0 = Y0_initial
         T = T_initial
-        continue # skip rest of loop, return to while
+        continue # skip rest of loop, return to while; isobaric retains rho
+
+    # Solution is ok; update the density as well for isobaric conditions
+    if (invert):
+        rho = dens       #update density from EOS call
 
     # Update time and initial condition for the next iteration
     t = sol.t[-1]
