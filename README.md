@@ -26,9 +26,7 @@
  To use, one must first compile the Helmholtz Fortran code in the subdirectory
   _helmholtz, eg,
   
- `cd _helmholtz`
- 
- `make`
+ `cd _helmholtz; make`
 
  The makefile defaults to the use of gfortran; to use another compiler, simply edit the `FC` 
  variable in the makefile.
@@ -47,4 +45,4 @@
 
  -rtf120523
 
- Last update: rtf120723
+ Last update: rtf020824
