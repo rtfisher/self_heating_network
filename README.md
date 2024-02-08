@@ -26,10 +26,11 @@
  To use, one must first compile the Helmholtz Fortran code in the subdirectory
   _helmholtz, eg,
   
- `cd _helmholtz`
- 
- `gfortran -o helmholtz.exe  helmholtz_wrapper.f90 helmholtz_library.F90 main.F90 invert_helm_pt.f90`
+ `cd _helmholtz; make`
 
+ The makefile defaults to the use of gfortran; to use another compiler, simply edit the `FC` 
+ variable in the makefile.
+ 
  Then to run the script, simply cd back to the top level and run
 
  `python3 self_heating.py`
@@ -44,4 +45,4 @@
 
  -rtf120523
 
- Last update: rtf120723
+ Last update: rtf020824
