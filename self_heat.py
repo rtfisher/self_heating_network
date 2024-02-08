@@ -133,69 +133,6 @@ for isotope in isotope_list:
     else:
         print(f"Attribute {attribute_name} not found in helium_network")
 
-""" Hardcoded isotope map, not used
-isotope_map = {
-    'p': helium_network.jp,
-    'n': helium_network.jn,
-    'he4': helium_network.jhe4,
-    'b11': helium_network.jb11,
-    'c12': helium_network.jc12,
-    'c13': helium_network.jc13,
-    'n13': helium_network.jn13,
-    'n14': helium_network.jn14,
-    'n15': helium_network.jn15,
-    'o15': helium_network.jo15,
-    'o16': helium_network.jo16,
-    'o17': helium_network.jo17,
-    'f18': helium_network.jf18,
-    'ne19': helium_network.jne19,
-    'ne20': helium_network.jne20,
-    'ne21': helium_network.jne21,
-    'ne22': helium_network.jne22,
-    'na22': helium_network.jna22,
-    'na23': helium_network.jna23,
-    'mg23': helium_network.jmg23,
-    'mg24': helium_network.jmg24,
-    'mg25': helium_network.jmg25,
-    'mg26': helium_network.jmg26,
-    'al25': helium_network.jal25,
-    'al26': helium_network.jal26,
-    'al27': helium_network.jal27,
-    'si26': helium_network.jsi26, # added for alpha-p process
-    'si28': helium_network.jsi28,
-    'si29': helium_network.jsi29,
-    'si30': helium_network.jsi30,
-    'p29': helium_network.jp29,
-    'p30': helium_network.jp30,
-    'p31': helium_network.jp31,
-    's30': helium_network.js30,
-    's31': helium_network.js31,
-    's32': helium_network.js32,
-    's33': helium_network.js33,
-    'cl33': helium_network.jcl33,
-    'cl34': helium_network.jcl34,
-    'cl35': helium_network.jcl35,
-    'ar34': helium_network.jar34,
-    'ar36': helium_network.jar36,
-    'ar37': helium_network.jar37,
-    'ar38': helium_network.jar38,
-    'ar39': helium_network.jar39,
-    'k39': helium_network.jk39,
-    'ca40': helium_network.jca40,
-    'sc43': helium_network.jsc43,
-    'ti44': helium_network.jti44,
-    'v47': helium_network.jv47,
-    'cr48': helium_network.jcr48,
-    'mn51': helium_network.jmn51,
-    'fe52': helium_network.jfe52,
-    'fe55': helium_network.jfe55,
-    'co55': helium_network.jco55,
-    'ni56': helium_network.jni56,
-    'ni58': helium_network.jni58,
-    'ni59': helium_network.jni59
-}
-"""
-
 # Set compositin.
 comp = pyna.Composition(rc.get_nuclei())
 comp.set_all (0.)
