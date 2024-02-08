@@ -32,10 +32,8 @@ import numpy as np
 from scipy.integrate import solve_ivp
 from mpl_toolkits.axes_grid1.inset_locator import inset_axes
 import aux # auxilliary module for additional code
-
-# Get the initial time
-initial_time = datetime.datetime.now()
-print("Begin run :", initial_time.strftime("%B %d, %Y, %H:%M:%S"))
+import sys
+import self_heat_gui as gui # GUI module for isotope selection
 
 parser = argparse.ArgumentParser(description="Nuclear reaction network script.")
 
@@ -88,19 +86,34 @@ else:
   print (f"Error: initial abundances ('{args.xhe4}' + '{args.xc12}' + '{args.xo16}' = '{norm}') must add to unity.")
   exit (1)
 
+# Initialize the pynucastro reaction library
 library = pyna.ReacLibLibrary()
-isotope_list = ["p", "n", "he4", "b11", "c12", "c13", "n13", "n14",
-                              "n15", "o15", "o16", "o17", "f18", "ne19",
-                              "ne20", "ne21", "ne22", "na22", "na23", "mg23", "mg24", 
-                              "mg25", "mg26", "al25", "al26", "al27", "si28", "si29",
-                              "si30", "p29", "p30", "p31", "s31",
-                              "s32", "s33", "cl33", "cl34", "cl35", "ar36", "ar37",
-                              "ar38", "ar39", "k39", "ca40",
-                              "sc43", "ti44", "v47", 
-                              "cr48", "mn51", "fe52", "fe55", "co55", "ni56",
-                              "ni58", "ni59",
-                              "si26", "s30", "ar34"  # added for alpha-p process
-                              ]
+
+# Define the isotopes to be included in the network
+app = gui.QApplication(sys.argv)
+ex = gui.IsotopeSelector()
+ex.show()
+result = app.exec_()
+isotope_list = ex.selected_isotopes  # Access the selected isotopes after the window is closed
+print(isotope_list)
+
+# Start the timer for integration, and get the initial time
+initial_time = datetime.datetime.now()
+print("Begin run :", initial_time.strftime("%B %d, %Y, %H:%M:%S"))
+
+# Hardcoded isotope list, not used
+#isotope_list = ["p", "n", "he4", "b11", "c12", "c13", "n13", "n14",
+#                              "n15", "o15", "o16", "o17", "f18", "ne19",
+#                              "ne20", "ne21", "ne22", "na22", "na23", "mg23", "mg24", 
+#                              "mg25", "mg26", "al25", "al26", "al27", "si28", "si29",
+#                              "si30", "p29", "p30", "p31", "s31",
+#                              "s32", "s33", "cl33", "cl34", "cl35", "ar36", "ar37",
+#                              "ar38", "ar39", "k39", "ca40",
+#                              "sc43", "ti44", "v47", 
+#                              "cr48", "mn51", "fe52", "fe55", "co55", "ni56",
+#                              "ni58", "ni59",
+#                              "si26", "s30", "ar34"  # added for alpha-p process
+#                              ]
 
 linking_isotopes = library.linking_nuclei( isotope_list)
 
@@ -325,7 +338,10 @@ ax.set_xlabel("t (s)")
 ax.set_ylabel("X")
 
 # Isotopes to plot
-species = [helium_network.jp, helium_network.jhe4, helium_network.jc12, helium_network.jo16, helium_network.jne20, helium_network.jne21, helium_network.jna23, helium_network.jmg24, helium_network.jal27,  helium_network.jsi28, helium_network.js32,  helium_network.jar36,  helium_network.jca40]
+#species = [helium_network.jp, helium_network.jhe4, helium_network.jc12, helium_network.jo16, helium_network.jne20, helium_network.jne21, helium_network.jna23, helium_network.jmg24, helium_network.jal27,  helium_network.jsi28, helium_network.js32,  helium_network.jar36,  helium_network.jca40]
+
+# Plot alpha chain (+ p) isotopes only 
+species = [helium_network.jp, helium_network.jhe4, helium_network.jc12, helium_network.jo16, helium_network.jne20, helium_network.jmg24,  helium_network.jsi28, helium_network.js32,  helium_network.jar36,  helium_network.jca40]
 
 solutions_array = np.array(solutions).T  # Transpose to match the expected shape
 times_array = np.array  (times)
