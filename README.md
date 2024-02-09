@@ -23,6 +23,10 @@
   time, and detonation_lengths.png for detonation initiation length
   versus time.
 
+![Sample plot of detonation lengths.](/_images/detonation_lengths.png)
+
+![Sample plot of reaction flows.](/_images/reaction_flow_0.10.png)
+
  To use, one must first compile the Helmholtz Fortran code in the subdirectory
   _helmholtz, eg,
   
