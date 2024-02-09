@@ -49,7 +49,7 @@
 
  `python3 self_heating.py --help`
 
- ** References **
+ <u>* References *</u>
  
  PGO11: https://arxiv.org/abs/1106.3696
  
