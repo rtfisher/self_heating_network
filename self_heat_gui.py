@@ -1,5 +1,6 @@
 import sys
 import math
+from pynucastro.nucdata import Nucleus
 from PyQt5.QtWidgets import QApplication, QWidget, QGridLayout, QPushButton, QMessageBox
 
 class IsotopeSelector(QWidget):
@@ -27,25 +28,34 @@ class IsotopeSelector(QWidget):
 
         # By default, all isotopes are selected
         self.selected_isotopes = self.isotope_list.copy()
+
+        # Initialize the mapping for isotopes to Z and N values
+        zn_map = {iso: Nucleus(iso) for iso in self.isotope_list}
         
-        # Determine the grid size
-        grid_size = math.ceil(math.sqrt(len(self.isotope_list)))
-        
-        # Place buttons in a grid, with all buttons selected by default
-        for i, isotope in enumerate(self.isotope_list):
-            btn = QPushButton(isotope)
+        # Calculate the maximum Z to invert the grid placement
+        max_Z = max(nuc.Z for nuc in zn_map.values())
+
+        # Sort isotopes based on Z (vertical) and N (horizontal)
+#        sorted_isotopes = sorted(self.isotope_list, key=lambda x: (zn_map[x][0], zn_map[x][1]))
+
+# Place buttons in the grid based on Z and N, inverting Z
+        for iso, nuc in zn_map.items():
+            Z, N = nuc.Z, nuc.N  # Correctly access Z and N
+            btn = QPushButton(iso)
             btn.setCheckable(True)
-            btn.setChecked(True)  # Button starts in a checked state
-            btn.setStyleSheet("background-color: lightgreen;")  # Initially highlighted
+            btn.setChecked(True)  # All isotopes selected by default
+            btn.setStyleSheet("background-color: lightgreen;")
             btn.clicked.connect(self.toggleIsotope)
-            row = i // grid_size
-            col = i % grid_size
-            self.grid_layout.addWidget(btn, row, col)
-        
+            self.grid_layout.addWidget(btn, max_Z - Z, N)  # Invert Z placement by subtracting from max_Z
+
         # Button to finalize selection and close the GUI
         self.include_button = QPushButton('Include Isotopes')
         self.include_button.clicked.connect(self.finalizeSelection)
-        self.grid_layout.addWidget(self.include_button, grid_size, 0, 1, grid_size) # Span the button across the last row
+#        self.grid_layout.addWidget(self.include_button, grid_size, 0, 1, grid_size) # Span the button across the last row
+#        self.grid_layout.addWidget(self.include_button, max(zn_map.values(), key=lambda x: x[0])[0] + 1, 0, 1, max_N + 1)
+        self.grid_layout.addWidget(self.include_button, max_Z + 1, 0)
+
+
         
         self.setLayout(self.grid_layout)
     
