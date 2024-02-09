@@ -19,6 +19,11 @@
  eps_nuc is the specific nuclear energy generation rate, and c_s is the 
  sound speed.
 
+ The code includes a GUI to allow the user to easily select isotopes to be included in the 
+ network calculation.
+
+ ![Sample plot of isotope selector.](/_images/isotope_selector.png)
+ 
  Two figures are produced, helium_abundances.png for abundances versus
   time, and detonation_lengths.png for detonation initiation length
   versus time.
