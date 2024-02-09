@@ -68,8 +68,6 @@ else:
 
 print ("<PYNUCDet:PYNUCastro Detonation Estimation Tool>  Copyright (C) 2024, Robert T. Fisher. This program comes with ABSOLUTELY NO WARRANTY. This is free software, and you are welcome to redistribute it under certain conditions: see the GNU General Public License for details.") 
 
-print ("invert = ", invert)
-
 if invert:
   print("Isobaric run")
 else:
@@ -99,7 +97,7 @@ ex = gui.IsotopeSelector()
 ex.show()
 result = app.exec_()
 isotope_list = ex.selected_isotopes  # Access the selected isotopes after the window is closed
-print(isotope_list)
+print("Included isotopes = ", isotope_list)
 
 # Start the timer for integration, and get the initial time
 initial_time = datetime.datetime.now()
