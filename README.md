@@ -1,5 +1,5 @@
-# PYNUCDet:PYNUCastro Detonation Estimation Tool 
- PYNUCDet does a self-heating nuclear network calculation for either constant
+# PYNUCDET:PYNUCastro Detonation Estimation Tool 
+ PYNUCDET does a self-heating nuclear network calculation for either constant
  volume (isochoric) or constant pressure (isobaric) conditions using Mike Zingale's 
  pynucastro for nuclear reaction rates and compositions, scipy.integrate for 
  integration method, and Frank Timmes's Helmholtz equation of state for the speed
