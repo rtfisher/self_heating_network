@@ -24,9 +24,10 @@
 
  ![Sample plot of isotope selector.](/_images/isotope_selector.png)
  
- Two figures are produced, helium_abundances.png for abundances versus
+ Three sets of figures are produced:  helium_abundances.png for abundances versus
   time, and detonation_lengths.png for detonation initiation length
-  versus time.
+  versus time, as well as a set of snapshots of reaction flows sampled at intervals
+  in the network burn.
 
 ![Sample plot of detonation lengths.](/_images/detonation_lengths.png)
 
