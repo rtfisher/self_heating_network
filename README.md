@@ -1,14 +1,14 @@
-# Self Heating Network
- self_heat.py is a script which does a self-heating nuclear network calculation 
- for either isochoric or isobaric conditions using pynucastro for nuclear
- reaction rates and composition, scipy.integrate for integration method,
- and the Helmholtz equation of state for specific heat. A variation of the 
- Helmholtz equation of state is called as a function of pressure and
- temperature, Abar, and Zbar and returns density, and is adapted from Frank 
- Timmmes' Torch code. The Helmholtz calls are handled by a custom Fortran
- wrapper around Helmholtz; the stdout from this wrapper contains the key EOS 
- outputs, which are parsed by the function call_helmholtz in the aux.py
- module, using subprocess.
+# PYNUCDet:PYNUCastro Detonation Estimation Tool 
+ PYNUCDet does a self-heating nuclear network calculation for either constant
+ volume (isochoric) or constant pressure (isobaric) conditions using Mike Zingale's 
+ pynucastro for nuclear reaction rates and compositions, scipy.integrate for 
+ integration method, and Frank Timmes's Helmholtz equation of state for the speed
+ of sound and specific heats. For isobaric conditions, a variation of the Helmholtz
+ equation of state (EOS) is called as a function of pressure and temperature, mean mass
+ number Abar, and mean atomic number Zbar, and returns density. This EOS is adapted from 
+ Frank Timmmes' Torch code. The Helmholtz calls are handled by a custom Fortran
+ wrapper around Helmholtz; the stdout from this wrapper contains the key EOS outputs, 
+ which are parsed by the function call_helmholtz in the aux.py module, using subprocess.
  
  We furter compute the critical length for distributed nuclear burning
  using Poloudnenko, Gardiner, & Oran's 2011 PRL condition. The essential idea
@@ -19,6 +19,9 @@
  eps_nuc is the specific nuclear energy generation rate, and c_s is the 
  sound speed.
 
+ Optically-thin neutrino cooling is included from pynucastro, and an optional stub (not fully
+ implemented) sets a prescribed turbulent dissipation rate.
+ 
  The code includes a GUI to allow the user to easily select isotopes to be included in the 
  network calculation.
 
@@ -49,7 +52,7 @@
 
  `python3 self_heating.py --help`
 
- <u>* References *</u>
+ # References 
  
  PGO11: https://arxiv.org/abs/1106.3696
  
