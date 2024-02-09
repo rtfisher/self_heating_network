@@ -1,7 +1,7 @@
 import sys
 import math
 from pynucastro.nucdata import Nucleus
-from PyQt5.QtWidgets import QApplication, QWidget, QGridLayout, QPushButton, QMessageBox
+from PyQt5.QtWidgets import QApplication, QWidget, QGridLayout, QPushButton, QMessageBox, QLabel
 from PyQt5.QtGui import QPainter, QPen
 from PyQt5.QtCore import Qt
 
@@ -26,7 +26,7 @@ class AxisWidget(QWidget):
         # Draw N axis (Horizontal)
         qp.drawLine(20, 80, 80, 80)  # Adjust these coordinates as needed
 
-        # Optionally, add labels for Z and N
+        # Add labels for Z and N
         qp.drawText(5, 20, 'Z')
         qp.drawText(80, 95, 'N')
 
@@ -40,9 +40,14 @@ class IsotopeSelector(QWidget):
         self.setWindowTitle('Isotope Selector')
         self.grid_layout = QGridLayout()
 
+        # Instructions included as a Qlabel
+        instructions = QLabel("Please deselect any isotopes to exclude from the reaction network by clicking. Green = included, White = excluded. Then press the \"Select Isotopes\" button to continue.")
+        instructions.setWordWrap(True)  # Enable word wrap for longer text
+        self.grid_layout.addWidget(instructions, 0, 0, 1, -1)  # Span the label across the top
+
        # Create and add the AxisWidget to the layout
         self.axisWidget = AxisWidget()
-        self.grid_layout.addWidget(self.axisWidget, 0, 0)  # Add it to the upper left
+        self.grid_layout.addWidget(self.axisWidget, 1, 0)  # Add it to the upper left
         
         # Your provided list of isotopes
         self.isotope_list = [
