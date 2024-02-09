@@ -64,7 +64,11 @@ elif args.isochoric:
     invert = False
 else:
     # Default behavior if neither isobaric nor isochoric is specified
-    invert = None
+    invert = False
+
+print ("<PYNUCDet:PYNUCastro Detonation Estimation Tool>  Copyright (C) 2024, Robert T. Fisher. This program comes with ABSOLUTELY NO WARRANTY. This is free software, and you are welcome to redistribute it under certain conditions: see the GNU General Public License for details.") 
+
+print ("invert = ", invert)
 
 if invert:
   print("Isobaric run")
@@ -100,20 +104,6 @@ print(isotope_list)
 # Start the timer for integration, and get the initial time
 initial_time = datetime.datetime.now()
 print("Begin run :", initial_time.strftime("%B %d, %Y, %H:%M:%S"))
-
-# Hardcoded isotope list, not used
-#isotope_list = ["p", "n", "he4", "b11", "c12", "c13", "n13", "n14",
-#                              "n15", "o15", "o16", "o17", "f18", "ne19",
-#                              "ne20", "ne21", "ne22", "na22", "na23", "mg23", "mg24", 
-#                              "mg25", "mg26", "al25", "al26", "al27", "si28", "si29",
-#                              "si30", "p29", "p30", "p31", "s31",
-#                              "s32", "s33", "cl33", "cl34", "cl35", "ar36", "ar37",
-#                              "ar38", "ar39", "k39", "ca40",
-#                              "sc43", "ti44", "v47", 
-#                              "cr48", "mn51", "fe52", "fe55", "co55", "ni56",
-#                              "ni58", "ni59",
-#                              "si26", "s30", "ar34"  # added for alpha-p process
-#                              ]
 
 linking_isotopes = library.linking_nuclei( isotope_list)
 
@@ -164,7 +154,7 @@ t    = 0.
 accumulated_time = 0  # Initialize an accumulated time counter
 tmax = args.tmax  
 dt   = 1.e-3 * tmax # Initial timestep, scaled by tmax
-dt_plot = tmax / 10  # Plot at every dt_plot interval, scaled by tmax
+dt_plot = tmax / 10  # Plot network flows  every dt_plot, scaled by tmax
 
 # Initialize lists for data storage
 times = []
@@ -220,14 +210,14 @@ while t < tmax:
         fig.savefig (f"reaction_flow_{formatted_time}.png")
         fig.clf()
         # Reset the accumulated time
-        accumulated_time -= dt_plot
+#        accumulated_time -= dt_plot
+        accumulated_time = 0.
 
     if not (invert):
-    # Calculate temperature increment for isochoric network using specifc heat cv
+    # Calculate temp. increment for isochoric network using specifc heat cv
       dT = (de_nuc + (eturb - snu) * dt) / cv
     else:
       dT = (de_nuc + (eturb - snu) * dt) / cp # isobaric with specific heat cp
-#      rho = dens       #update density from EOS call
 
     T += dT
 
@@ -255,6 +245,10 @@ while t < tmax:
     Y0 = sol.y[:, -1]
 
     dt *= 1.01 #increase timestep
+
+# Modify dt to ensure the time interval between plots is exactly dt_plot
+    if accumulated_time + dt > dt_plot:
+        dt = dt_plot - accumulated_time
 
     # Check if the next step exceeds tmax
     if t + dt > tmax:
