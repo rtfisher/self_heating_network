@@ -17,12 +17,12 @@ class IsotopeSelector(QWidget):
             "p", "n", "he4", "b11", "c12", "c13", "n13", "n14",
             "n15", "o15", "o16", "o17", "f18", "ne19",
             "ne20", "ne21", "ne22", "na22", "na23", "mg23", "mg24",
-            "mg25", "mg26", "al25", "al26", "al27", "si28", "si29",
-            "si30", "p29", "p30", "p31", "s31",
-            "s32", "s33", "cl33", "cl34", "cl35", "ar36", "ar37",
+            "mg25", "mg26", "al25", "si26", "al26", "al27", "si28", "si29",
+            "si30", "p29", "p30", "s30", "p31", "s31",
+            "s32", "s33", "ar34", "cl33", "cl34", "cl35", "ar36", "ar37",
             "ar38", "ar39", "k39", "ca40", "sc43", "ti44", "v47",
             "cr48", "mn51", "fe52", "fe55", "co55", "ni56",
-            "ni58", "ni59", "si26", "s30", "ar34"
+            "ni58", "ni59" 
         ]
 
         # By default, all isotopes are selected
