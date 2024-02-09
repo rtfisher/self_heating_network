@@ -207,7 +207,7 @@ while t < tmax:
         print(f"Plotting at time {t}")
         fig = rc.plot(rho=dens, T=T, comp=comp, ydot_cutoff_value=1.e-3, curved_edges=False, rotated=False, node_size=800, node_font_size=14, size=(3200, 2400), hide_xalpha=True)
         formatted_time = "{:.2f}".format(t)  # Format to 2 decimal places
-        fig.savefig (f"reaction_flow_{formatted_time}.png")
+        fig.savefig (f"reaction_flow_{formatted_time}.png", dpi=300)
         fig.clf()
         # Reset the accumulated time
 #        accumulated_time -= dt_plot
@@ -294,7 +294,7 @@ else:
 # Set legend location. Other options include 'upper right', 'lower left', 'best', etc.
 ax.legend(loc='upper right')
 
-fig.savefig ("helium_abundances.png")
+fig.savefig ("helium_abundances.png", dpi=300)
 fig.clf()
 
 ############################################################
@@ -346,7 +346,7 @@ inset_ax.patch.set_alpha(0.5)  # Adjust alpha for transparency, 0 is fully trans
 inset_ax.set_xlabel('Time (s)')
 inset_ax.set_ylabel(r'log ($\epsilon_{\rm nuc}$)')
 
-fig.savefig("detonation_lengths.png")
+fig.savefig("detonation_lengths.png", dpi=300)
 
 # Get the final time
 final_time = datetime.datetime.now()
