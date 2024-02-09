@@ -32,7 +32,10 @@
   versus time, as well as a set of snapshots of reaction flows sampled at intervals
   in the network burn.
 
+
 ![Sample plot of detonation lengths.](/_images/detonation_lengths.png)
+
+![Sample plot of abundances.](/_images/helium_abundances.png)
 
 ![Sample plot of reaction flows.](/_images/reaction_flow_0.10.png)
 
