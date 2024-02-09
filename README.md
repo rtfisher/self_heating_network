@@ -52,6 +52,25 @@
 
  `python3 self_heating.py --help`
 
+ This outputs
+ 
+ `usage: self_heat.py [-h] [--isobaric | --isochoric] [-rho RHO] [-T T]`
+                   `[-xhe4 XHE4] [-xc12 XC12] [-xo16 XO16] [-tmax TMAX]`
+
+ `Nuclear reaction network script.`
+
+ options:
+   -h, --help   show this help message and exit
+   --isobaric   Use isobaric conditions, with pressure set by initial density,
+                temperature, and composition.
+   --isochoric  Use isochoric conditions established by initial density.
+   -rho RHO     Initial mass density in g/cm^3.
+   -T T         Initial temperature in Kelvin.
+   -xhe4 XHE4   Initial abundance of He4.
+   -xc12 XC12   Initial abundance of C12.
+   -xo16 XO16   Initial abundance of O16.
+   -tmax TMAX   Simulation evolutionary time (in seconds).
+
  # References 
  
  PGO11: https://arxiv.org/abs/1106.3696
