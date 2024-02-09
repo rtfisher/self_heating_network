@@ -8,7 +8,8 @@
  number Abar, and mean atomic number Zbar, and returns density. This EOS is adapted from 
  Frank Timmmes' Torch code. The Helmholtz calls are handled by a custom Fortran
  wrapper around Helmholtz; the stdout from this wrapper contains the key EOS outputs, 
- which are parsed by the function call_helmholtz in the aux.py module, using subprocess.
+ which are parsed by the function call_helmholtz in the aux.py module, using the Python
+ subprocess module.
  
  We furter compute the critical length for distributed nuclear burning
  using Poloudnenko, Gardiner, & Oran's 2011 PRL condition. The essential idea
