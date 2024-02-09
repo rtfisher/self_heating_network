@@ -2,6 +2,33 @@ import sys
 import math
 from pynucastro.nucdata import Nucleus
 from PyQt5.QtWidgets import QApplication, QWidget, QGridLayout, QPushButton, QMessageBox
+from PyQt5.QtGui import QPainter, QPen
+from PyQt5.QtCore import Qt
+
+class AxisWidget(QWidget):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setMinimumSize(100, 100)  # Set minimum size for the drawing area
+
+    def paintEvent(self, event):
+        qp = QPainter(self)
+#        qp.begin(self)
+        self.drawCoordinates(qp)
+        qp.end()
+
+    def drawCoordinates(self, qp):
+        pen = QPen(Qt.black, 2, Qt.SolidLine)
+        qp.setPen(pen)
+
+        # Draw Z axis (Vertical)
+        qp.drawLine(20, 80, 20, 20)  # Adjust these coordinates as needed
+
+        # Draw N axis (Horizontal)
+        qp.drawLine(20, 80, 80, 80)  # Adjust these coordinates as needed
+
+        # Optionally, add labels for Z and N
+        qp.drawText(5, 20, 'Z')
+        qp.drawText(80, 95, 'N')
 
 class IsotopeSelector(QWidget):
     def __init__(self):
@@ -12,6 +39,10 @@ class IsotopeSelector(QWidget):
     def initUI(self):
         self.setWindowTitle('Isotope Selector')
         self.grid_layout = QGridLayout()
+
+       # Create and add the AxisWidget to the layout
+        self.axisWidget = AxisWidget()
+        self.grid_layout.addWidget(self.axisWidget, 0, 0)  # Add it to the upper left
         
         # Your provided list of isotopes
         self.isotope_list = [
