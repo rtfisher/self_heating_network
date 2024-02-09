@@ -44,7 +44,11 @@
  Then to run the script, simply cd back to the top level and run
 
  `python3 self_heating.py`
-  
+
+ The command line options can be displayed by running
+
+ `python3 self_heating.py --help`
+ 
  PGO11: https://arxiv.org/abs/1106.3696
  
  pynucastro: https://pynucastro.github.io/pynucastro/
