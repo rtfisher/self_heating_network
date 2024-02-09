@@ -48,6 +48,8 @@
  The command line options can be displayed by running
 
  `python3 self_heating.py --help`
+
+ ** References **
  
  PGO11: https://arxiv.org/abs/1106.3696
  
@@ -59,4 +61,4 @@
 
  -rtf120523
 
- Last update: rtf020824
+ Last update: rtf020924
