@@ -21,10 +21,10 @@
  runaway burning leads to the development of a shock front and a subsequent 
  detonation.
 
- Mathematically, t_burn < t_cross over some length scale L, so that the critical length
- L > (e_int / eps_nuc) c_s. Here e_int is the specific internal energy,
- eps_nuc is the specific nuclear energy generation rate, and c_s is the 
- sound speed.
+ Mathematically, this condition is equivalent to the statement t_burn < t_cross
+ over some length scale L, so that the critical length L > (e_int / eps_nuc) c_s. 
+ Here e_int is the specific internal energy, eps_nuc is the specific nuclear energy 
+ generation rate, and c_s is the sound speed.
 
  Optically-thin neutrino cooling is included from pynucastro, and an optional stub (not fully
  implemented) sets a prescribed turbulent dissipation rate.
