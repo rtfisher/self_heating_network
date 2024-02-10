@@ -47,6 +47,7 @@ parser.add_argument('-rho', type=float, default=1.e5, help='Initial mass density
 parser.add_argument('-T', type=float, default=1.e9, help='Initial temperature in Kelvin.')
 
 # Add arguments for initial abundances
+parser.add_argument('-xp', type=float, default=0.0, help='Initial abundance of protons.')
 parser.add_argument('-xhe4', type=float, default=0.8, help='Initial abundance of He4.')
 parser.add_argument('-xc12', type=float, default=0.1, help='Initial abundance of C12.')
 parser.add_argument('-xo16', type=float, default=0.1, help='Initial abundance of O16.')
@@ -78,14 +79,15 @@ rho = args.rho # g/cm^3
 T_init = T = args.T  # K
 
 # Define initial abundances and initialize pyna Composition object
-norm = args.xhe4 + args.xc12 + args.xo16
+norm = args.xp + args.xhe4 + args.xc12 + args.xo16
 
 if (norm == 1):
+  xp_init  = args.xp
   xhe4_init = args.xhe4
   xc12_init = args.xc12
   xo16_init = args.xo16
 else:
-  print (f"Error: initial abundances ('{args.xhe4}' + '{args.xc12}' + '{args.xo16}' = '{norm}') must add to unity.")
+  print (f"Error: initial abundances ('{args.xp}' + '{args.xhe4}' + '{args.xc12}' + '{args.xo16}' = '{norm}') must add to unity.")
   exit (1)
 
 # Initialize the pynucastro reaction library
@@ -124,12 +126,14 @@ for isotope in isotope_list:
 # Set compositin.
 comp = pyna.Composition(rc.get_nuclei())
 comp.set_all (0.)
+comp.set_nuc ("p", xp_init)
 comp.set_nuc ("he4", xhe4_init)
 comp.set_nuc ("c12", xc12_init)
 comp.set_nuc ("o16", xo16_init)
 
 # Also define a numpy array of mass and number initial abundances X0 and Y0
 X0 = np.zeros (helium_network.nnuc)
+X0 [helium_network.jp] = xp_init
 X0 [helium_network.jhe4] = xhe4_init
 X0 [helium_network.jc12] = xc12_init
 X0 [helium_network.jo16] = xo16_init
@@ -201,9 +205,10 @@ while t < tmax:
     eturb = 0.
 
     # Check if the accumulated time has reached or exceeded dt_plot
-    if accumulated_time >= dt_plot:
+    if accumulated_time >=  dt_plot:
         print(f"Plotting at time {t}")
-        fig = rc.plot(rho=dens, T=T, comp=comp, ydot_cutoff_value=1.e-3, curved_edges=False, rotated=False, node_size=800, node_font_size=14, size=(3200, 2400), hide_xalpha=True)
+        ydotmax = np.max (np.abs (dYdt) )
+        fig = rc.plot(rho=dens, T=T, comp=comp, ydot_cutoff_value=1.e-2 * ydotmax, curved_edges=False, rotated=False, node_size=800, node_font_size=14, size=(3200, 2400), hide_xalpha=True)
         formatted_time = "{:.2f}".format(t)  # Format to 2 decimal places
         fig.savefig (f"reaction_flow_{formatted_time}.png", dpi=300)
         fig.clf()
@@ -229,7 +234,8 @@ while t < tmax:
     # Check if temperature increment is too large
     if abs(dT / T_initial) > 0.01:
         # Halve the time step and redo the step
-        dt /= 2.0
+        print ("Halving timestep due to large temperature increment")
+        dt /= 2.0 # Need to check that dt is not too small
         Y0 = Y0_initial
         T = T_initial
         continue # skip rest of loop, return to while; isobaric retains rho
@@ -325,7 +331,7 @@ else:
 
 # Add text box in the upper left of the figure
 #text_str = r'$X(^4\mathrm{He}) = 1.0$, $X(^{12}\mathrm{C}) = 0$'
-text_str = fr'$X(^4\mathrm{{He}}) = {aux.float_to_latex_scientific(xhe4_init)}$, $X(^{{12}}\mathrm{{C}}) = {aux.float_to_latex_scientific(xc12_init)}$, $X(^{{16}}\mathrm{{O}}) = {aux.float_to_latex_scientific(xo16_init)}$'
+text_str = fr'$X(\mathrm{{p}}) = {aux.float_to_latex_scientific(xp_init)}$, $X(^4\mathrm{{He}}) = {aux.float_to_latex_scientific(xhe4_init)}$, $X(^{{12}}\mathrm{{C}}) = {aux.float_to_latex_scientific(xc12_init)}$, $X(^{{16}}\mathrm{{O}}) = {aux.float_to_latex_scientific(xo16_init)}$'
 
 plt.text(0.05, 0.95, text_str, transform=plt.gca().transAxes, fontsize=10,
          verticalalignment='top', bbox=dict(boxstyle='round,pad=0.5', facecolor='white', edgecolor='black'))
