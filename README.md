@@ -46,6 +46,8 @@
 
 ![Sample plot of reaction flows.](/_images/reaction_flow_0.10.png)
 
+# Compilation and Usage
+
  To use, one must first compile the Helmholtz Fortran code in the subdirectory
   _helmholtz, eg,
   
