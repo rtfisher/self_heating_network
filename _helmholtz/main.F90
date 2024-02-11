@@ -41,7 +41,7 @@
   ! If no arguments, print usage and exit
       if (narg == 0) then
         print *, 'Usage: helm_program <invert> <dens> <temp> <abar> <zbar> <pres>'
-        print *, 'Where:'
+        print *, 'Where inputs include:'
         print *, '  invert= True/False for inversion or normal mode'
         print *, '  dens  = density rho (g/cm^3) for invert=False'
         print *, '  temp  = temperature T (K)'
@@ -50,6 +50,7 @@
         print *, '  pres  = pressure (dyne/cm^2) for invert=True'
         print *, ' Inversion mode True inputs dens (starting guess), temp, abar, zbar, pres and outputs density and other EOS data'
         print *, ' Inversion mode False inputs density, temp, abar, zbar, and outputs pressure and other EOS data'
+        print *, ' Outputs dens, pres, eint, gammac, gammae, h = eint + pres / dens, cs, cp, and cv to stdout, all in CGS units'
         stop
       end if
 
@@ -71,9 +72,14 @@
       end if
 
    ! If in inversion mode, also read in pressure
-      if ((invert) .and. (narg >= 6)) then
-        call GET_COMMAND_ARGUMENT(6, arg)
-        read(arg, *) pres
+      if (invert) then
+        if (narg >= 6) then
+          call GET_COMMAND_ARGUMENT(6, arg)
+          read(arg, *) pres
+        else
+          print *, 'Error: Insufficient arguments for inversion mode: also require pressure input.'
+          stop
+        end if
       end if
 
 
