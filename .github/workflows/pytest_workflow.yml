@@ -7,7 +7,7 @@ on:
     - cron: '0 0 * * *'  # Runs at 00:00 UTC every day
 
 jobs:
-  build:
+  build_and_test:
     runs-on: ubuntu-latest  # Specifies the runner environment
 
     steps:
