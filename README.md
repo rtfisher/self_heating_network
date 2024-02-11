@@ -4,9 +4,9 @@
  pynucastro for nuclear reaction rates and compositions, scipy.integrate for 
  integration method, and Frank Timmes's Helmholtz equation of state for the speed
  of sound and specific heats. For isobaric conditions, a variation of the Helmholtz
- equation of state (EOS) is called as a function of pressure and temperature, mean mass
- number Abar, and mean atomic number Zbar, and returns density. This EOS is adapted from 
- Frank Timmmes' Torch code. The Helmholtz calls are handled by a custom Fortran
+ equation of state (EOS) adapted from Frank Timmes's Torch code is called as a 
+ function of pressure and temperature, mean mass number Abar, and mean atomic number 
+ Zbar, and returns density. The Helmholtz calls are handled by a custom Fortran
  wrapper around Helmholtz; the stdout from this wrapper contains the key EOS outputs, 
  which are parsed by the function call_helmholtz in the aux.py module, using the Python
  subprocess module.
