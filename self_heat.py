@@ -319,12 +319,20 @@ ax_right = ax_left.twinx()
 
 # Plotting proton abundances on the right y-axis
 ax_right.plot(times, solutions_array[helium_network.jp, :], 'r')  # 'r' for red line, change as needed
-ax_right.set_yscale('log')
+#ax_right.set_yscale('log')
 #ax_right.set_ylim(1.e-8, 1.e-4)
-# Dynamically adjust the second y-axis limit  
+# Dynamically adjust the second y-axis limits based on the maximum and minimum values of the proton abundance; switch from log to linear scale if the dynamic range is too small
 xpmax = np.max(solutions_array[helium_network.jp, :])
-roundxpmax = 10**(round (math.log10 (xpmax) ) )
-ax_right.set_ylim(1.e-4 * roundxpmax, roundxpmax)
+xpmin = np.min(solutions_array[helium_network.jp, :])
+if (xpmin < 1.e-2 * xpmax):
+    roundxpmax = 10**(round (math.log10 (xpmax) ) )
+    ax_right.set_ylim(1.e-4 * roundxpmax, roundxpmax)
+    ax_right.set_yscale('log')
+else:
+    ax_right.set_ylim(0, 1.0)
+    ax_right.set_yscale('linear')
+#roundxpmax = 10**(round (math.log10 (xpmax) ) )
+#ax_right.set_ylim(1.e-4 * roundxpmax, roundxpmax)
 ax_right.set_ylabel('X (p)')
 
 if (invert):
