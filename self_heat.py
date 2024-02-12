@@ -23,8 +23,7 @@
 ##
 ############################################################################
 
-import datetime
-import argparse
+import datetime, argparse, math
 import pynucastro as pyna
 from pynucastro.neutrino_cooling import sneut5
 import matplotlib.pyplot as plt
@@ -158,14 +157,14 @@ tmax = args.tmax
 dt   = 1.e-3 * tmax # Initial timestep, scaled by tmax
 dt_plot = tmax / 10  # Plot network flows  every dt_plot, scaled by tmax
 
-# Initialize lists for data storage
+# Initialize lists for data storage; the lists will be appended to at each timestep so that they always have a length appropriate for the number of timesteps.
 times = []
 solutions = []
 energies = []
 critical_lengths = []
 
 while t < tmax:
-    print ("t = ", t, " dt = ", dt, " T = ", T)
+    print ("t (s) = ", t, " dt (s) = ", dt, " T (K) = ", T)
     # Save the initial state in case we need to redo the step
     Y0_initial = Y0.copy()
     T_initial = T
@@ -321,7 +320,11 @@ ax_right = ax_left.twinx()
 # Plotting proton abundances on the right y-axis
 ax_right.plot(times, solutions_array[helium_network.jp, :], 'r')  # 'r' for red line, change as needed
 ax_right.set_yscale('log')
-ax_right.set_ylim(1.e-8, 1.e-4)
+#ax_right.set_ylim(1.e-8, 1.e-4)
+# Dynamically adjust the second y-axis limit  
+xpmax = np.max(solutions_array[helium_network.jp, :])
+roundxpmax = 10**(round (math.log10 (xpmax) ) )
+ax_right.set_ylim(1.e-4 * roundxpmax, roundxpmax)
 ax_right.set_ylabel('X (p)')
 
 if (invert):
