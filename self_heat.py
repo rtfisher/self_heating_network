@@ -36,7 +36,7 @@ import self_heat_gui as gui # GUI module for isotope selection
 
 parser = argparse.ArgumentParser(description="Nuclear reaction network script.")
 
- # Add mutually exclusive group for --isobaric and --isochoric
+ # Add mutually exclusive group for --isobaric and --isochoric to avoid both being accidentally set
 group = parser.add_mutually_exclusive_group()
 group.add_argument('--isobaric', action='store_true', help='Use isobaric conditions, with pressure set by initial density, temperature, and composition.')
 group.add_argument('--isochoric', action='store_true', help='Use isochoric conditions established by initial density.')
