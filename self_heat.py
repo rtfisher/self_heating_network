@@ -34,7 +34,7 @@ import aux # auxilliary module for additional code
 import sys
 import self_heat_gui as gui # GUI module for isotope selection
 
-parser = argparse.ArgumentParser(description="Nuclear reaction network script.")
+parser = argparse.ArgumentParser(description="Self-heating nuclear reaction network script.")
 
  # Add mutually exclusive group for --isobaric and --isochoric to avoid both being accidentally set
 group = parser.add_mutually_exclusive_group()
@@ -53,6 +53,9 @@ parser.add_argument('-xo16', type=float, default=0.1, help='Initial abundance of
 
 #Add argument for run duration.
 parser.add_argument('-tmax', type=float, default=0.1, help='Simulation evolutionary time (in seconds).')
+
+#Add argument to allow for optional output of C++ network. Python is automatically generated.
+parser.add_argument("--cppnet", action="store_false", help="Generate a C++ network")
 
 # Parse the arguments
 args = parser.parse_args()
@@ -106,8 +109,14 @@ print("Begin run :", initial_time.strftime("%B %d, %Y, %H:%M:%S"))
 
 linking_isotopes = library.linking_nuclei( isotope_list)
 
+# Generate the Python rate network
 rc = pyna.RateCollection(libraries=linking_isotopes) # Using Reaclib
 pynet = pyna.PythonNetwork (libraries=linking_isotopes)
+
+# Also output a C++ network if requested
+if args.cppnet:
+     cppnet = pyna.SimpleCxxNetwork (libraries=linking_isotopes)
+     cppnet.write_network ("cpp_helium_network_directory")
 
 # Write out the network and import it back in
 pynet.write_network ("helium_network.py")
