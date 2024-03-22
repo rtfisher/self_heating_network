@@ -63,7 +63,6 @@ parser.add_argument("--gui", action="store_true", help="Select isotopes using a 
 # Parse the arguments
 args = parser.parse_args()
 
-print ("args.gui = ", args.gui)
 # Set the invert variable based on the arguments
 if args.isobaric:
     invert = True
@@ -84,6 +83,8 @@ else:
 rho = args.rho # g/cm^3
 T_init = T = args.T  # K
 
+print ("Initial density = ", rho, " g/cm^3", " Initial temperature = ", T, " K")
+
 # Define initial abundances and initialize pyna Composition object
 norm = args.xp + args.xhe4 + args.xc12 + args.xo16
 
@@ -92,6 +93,7 @@ if (norm == 1):
   xhe4_init = args.xhe4
   xc12_init = args.xc12
   xo16_init = args.xo16
+  print (f"Initial abundances: xp = {xp_init}, xhe4 = {xhe4_init}, xc12 = {xc12_init}, xo16 = {xo16_init}")
 else:
   print (f"Error: initial abundances ('{args.xp}' + '{args.xhe4}' + '{args.xc12}' + '{args.xo16}' = '{norm}') must add to unity.")
   exit (1)
