@@ -131,7 +131,7 @@ for isotope in isotope_list:
     else:
         print(f"Attribute {attribute_name} not found in helium_network")
 
-# Set compositin.
+# Set composition.
 comp = pyna.Composition(rc.get_nuclei())
 comp.set_all (0.)
 comp.set_nuc ("p", xp_init)
@@ -377,3 +377,17 @@ final_time = datetime.datetime.now()
 time_difference = final_time - initial_time
 print("End run:", final_time.strftime("%B %d, %Y, %H:%M:%S"))
 print("Total run time (seconds):", time_difference.total_seconds())
+
+# Store the detonation length data in a file
+# Assuming you have the "critical_lengths_array" defined somewhere in your code
+min_critical_length = np.min(critical_lengths_array)
+
+# Create the output string
+output = f"{args.xhe4} {args.xc12} {args.xo16} {args.rho} {args.T} {min_critical_length}\n"
+
+# Append the output string to the file
+with open("detonation_lengths.dat", "a") as file:
+    file.write(output)
+
+# Terminate with normal execution
+sys.exit (0)
