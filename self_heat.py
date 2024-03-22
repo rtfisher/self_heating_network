@@ -55,11 +55,15 @@ parser.add_argument('-xo16', type=float, default=0.1, help='Initial abundance of
 parser.add_argument('-tmax', type=float, default=0.1, help='Simulation evolutionary time (in seconds).')
 
 #Add argument to allow for optional output of C++ network. Python is automatically generated.
-parser.add_argument("--cppnet", action="store_false", help="Generate a C++ network")
+parser.add_argument("--cppnet", action="store_true", help="Generate a C++ network")
+
+# Add flag for GUI isotope selection
+parser.add_argument("--gui", action="store_true", help="Select isotopes using a GUI.")
 
 # Parse the arguments
 args = parser.parse_args()
 
+print ("args.gui = ", args.gui)
 # Set the invert variable based on the arguments
 if args.isobaric:
     invert = True
@@ -95,12 +99,26 @@ else:
 # Initialize the pynucastro reaction library
 library = pyna.ReacLibLibrary()
 
-# Define the isotopes to be included in the network
-app = gui.QApplication(sys.argv)
-ex = gui.IsotopeSelector()
-ex.show()
-result = app.exec_()
-isotope_list = ex.selected_isotopes  # Access the selected isotopes after the window is closed
+# Define the isotopes to be included in the network using a GUI
+if args.gui:
+  app = gui.QApplication(sys.argv)
+  ex = gui.IsotopeSelector()
+  ex.show()
+  result = app.exec_()
+  isotope_list = ex.selected_isotopes  # Access the selected isotopes after the window is closed
+else: # use the full network by default
+  isotope_list = [
+            "p", "n", "he4", "b11", "c12", "c13", "n13", "n14",
+            "n15", "o15", "o16", "o17", "f18", "ne19",
+            "ne20", "ne21", "ne22", "na22", "na23", "mg23", "mg24",
+            "mg25", "mg26", "al25", "si26", "al26", "al27", "si28", "si29",
+            "si30", "p29", "p30", "s30", "p31", "s31",
+            "s32", "s33", "ar34", "cl33", "cl34", "cl35", "ar36", "ar37",
+            "ar38", "ar39", "k39", "ca40", "sc43", "ti44", "v47",
+            "cr48", "mn51", "fe52", "fe55", "co55", "ni56",
+            "ni58", "ni59"
+           ]
+
 print("Included isotopes = ", isotope_list)
 
 # Start the timer for integration, and get the initial time
