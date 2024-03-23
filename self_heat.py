@@ -88,7 +88,10 @@ print ("Initial density = ", rho, " g/cm^3", " Initial temperature = ", T, " K")
 # Define initial abundances and initialize pyna Composition object
 norm = args.xp + args.xhe4 + args.xc12 + args.xo16
 
-if (norm == 1):
+tolerance = 1e-15  # Adjust the tolerance value as needed
+
+if abs(norm - 1) < tolerance:
+#if (norm == 1):
   xp_init  = args.xp
   xhe4_init = args.xhe4
   xc12_init = args.xc12
