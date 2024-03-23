@@ -328,7 +328,7 @@ else:
 # Set legend location. Other options include 'upper right', 'lower left', 'best', etc.
 ax.legend(loc='upper right')
 
-fig.savefig ("helium_abundances.png", dpi=300)
+fig.savefig ("abundances.png", dpi=300)
 fig.clf()
 
 ############################################################
