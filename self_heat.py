@@ -11,9 +11,19 @@
 ##  t_burn < t_cross over some length scale L to find the critical length
 ##  L > (e_int / eps_nuc) c_s.
 ##
+## The algorithm proceeds by initializing the network in pynucastro,
+##  setting initial abundances, density, and temperature, and integrating
+##  these forward in time to obtain the nuclear energy release as well
+##  as the optically-thin neutrino cooling. The temperature is then updated
+##  using these heating and cooling rates, as well as C_V or C_P calculated
+##  from the Helmholtz EOS assuming isochoric or isobaric thermodynamic
+##  conditions, respectively. For isobaric conditions, the density is updated
+##  with another call to Helmholtz in an inverse mode, inputing pressure and
+##  temperature (and composition) and returning density.
+##
 ## Two figures are produced, helium_abundances.png for abundances versus
 ##  time, and detonation_lengths.png for detonation initiation length
-##  versus time.
+##  versus time. The figures are adaptively generated and labeled.
 ##
 ## PGO11: https://arxiv.org/abs/1106.3696
 ## pynucastro: https://pynucastro.github.io/pynucastro/
@@ -226,7 +236,7 @@ while t < tmax:
     snu = sneut5 (rho, T, comp) # erg / g / s
 
     # Call to the EOS, include T/F flag invert to determine whether we call the EOS
-    #  as rho/T mode or T/P mode as an inversion, respectgively. For isobaric calls,
+    #  as rho/T mode or T/P mode as an inversion, respectively. For isobaric calls,
     #  the rho value is taken as an initial guess
     dens, pres, eint, gammac, gammae, h, cs, cp, cv = aux.call_helmholtz (invert, rho, T, abar, zbar, pres)
 
