@@ -9,7 +9,7 @@ def clean_up_specific_files(directory):
     """
     # Files and patterns to delete
     files_and_patterns = [
-        "helium_abundances.png",
+        "abundances.png",
         "detonation_lengths.png",
         "reaction_flow_*.png"  # This will match all files starting with 'reaction_flow_' and ending with '.png'
     ]
