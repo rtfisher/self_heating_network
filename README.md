@@ -95,7 +95,7 @@
 
  # References 
  
- PGO11: https://arxiv.org/abs/1106.3696
+ Poloudnenko, Gardiner, & Oran's 2011 PRL: https://arxiv.org/abs/1106.3696
  
  pynucastro: https://pynucastro.github.io/pynucastro/
 
