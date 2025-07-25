@@ -138,20 +138,20 @@ pynet = pyna.PythonNetwork (libraries=linking_isotopes)
 # Also output a C++ network if requested
 if args.cppnet:
      cppnet = pyna.SimpleCxxNetwork (libraries=linking_isotopes)
-     cppnet.write_network ("cpp_helium_network_directory")
+     cppnet.write_network ("cpp_nuclear_network_directory")
 
 # Write out the network and import it back in
-pynet.write_network ("helium_network.py")
-import helium_network as helium_network
+pynet.write_network ("nuclear_network.py")
+import nuclear_network as nuclear_network
 
 # Auo-generate a map of isotope names to indices in the network
 isotope_map = {}
 for isotope in isotope_list:
     attribute_name = 'j' + isotope
-    if hasattr(helium_network, attribute_name):
-        isotope_map[isotope] = getattr(helium_network, attribute_name)
+    if hasattr(nuclear_network, attribute_name):
+        isotope_map[isotope] = getattr(nuclear_network, attribute_name)
     else:
-        print(f"Attribute {attribute_name} not found in helium_network")
+        print(f"Attribute {attribute_name} not found in nuclear_network")
 
 # Set composition.
 comp = pyna.Composition(rc.get_nuclei())
@@ -162,16 +162,16 @@ comp.set_nuc ("c12", xc12_init)
 comp.set_nuc ("o16", xo16_init)
 
 # Also define a numpy array of mass and number initial abundances X0 and Y0
-X0 = np.zeros (helium_network.nnuc)
-X0 [helium_network.jp] = xp_init
-X0 [helium_network.jhe4] = xhe4_init
-X0 [helium_network.jc12] = xc12_init
-X0 [helium_network.jo16] = xo16_init
-Y0 = X0 / helium_network.A
+X0 = np.zeros (nuclear_network.nnuc)
+X0 [nuclear_network.jp] = xp_init
+X0 [nuclear_network.jhe4] = xhe4_init
+X0 [nuclear_network.jc12] = xc12_init
+X0 [nuclear_network.jo16] = xo16_init
+Y0 = X0 / nuclear_network.A
 
 # Calculate abar and zbar
-abar = comp.eval_abar()
-zbar = comp.eval_zbar()
+abar = comp.abar
+zbar = comp.zbar
 
 # For isobaric conditions, define a constant pressure by an initial call to Helmholtz
 #  using the initial density and temperature and composition.
@@ -201,8 +201,8 @@ while t < tmax:
     T_initial = T
 
     # Integrate the ODE system forward  to t + dt
-    sol = solve_ivp (helium_network.rhs, [t, t + dt], Y0, method="BDF",
-                     jac=helium_network.jacobian, dense_output=True,
+    sol = solve_ivp (nuclear_network.rhs, [t, t + dt], Y0, method="BDF",
+                     jac=nuclear_network.jacobian, dense_output=True,
                      args=(rho, T), rtol=1.e-6, atol=1.e-6)
 
     # Append the latest timestep data to solutions
@@ -212,15 +212,15 @@ while t < tmax:
     # Compute the specific nuclear energy increase
     n = sol.y.shape[1] - 1
     dY = sol.y[:, n] - Y0_initial [:]   # Y difference over timestep
-    de_nuc = helium_network.energy_release(dY)
+    de_nuc = nuclear_network.energy_release(dY)
 
     # Update mass composition X = Y * A
     for isotope, index in isotope_map.items():
-        comp.set_nuc(isotope, sol.y [index, n] * helium_network.A [index])
+        comp.set_nuc(isotope, sol.y [index, n] * nuclear_network.A [index])
 
     # Update abar and zbar
-    abar = comp.eval_abar()
-    zbar = comp.eval_zbar()
+    abar = comp.abar
+    zbar = comp.zbar
 
 # Calculate the specific neutrino loss rate
     snu = sneut5 (rho, T, comp) # erg / g / s
@@ -258,8 +258,8 @@ while t < tmax:
     dYdt = dY / dt
 
     # Calculate critical length and append to list
-    critical_lengths.append (eint / helium_network.energy_release(dYdt) * cs)
-    energies.append ( helium_network.energy_release(dYdt) )
+    critical_lengths.append (eint / nuclear_network.energy_release(dYdt) * cs)
+    energies.append ( nuclear_network.energy_release(dYdt) )
 
     # Check if temperature increment is too large
     if abs(dT / T_initial) > 0.01:
@@ -303,10 +303,10 @@ ax.set_xlabel("t (s)")
 ax.set_ylabel("X")
 
 # Isotopes to plot
-#species = [helium_network.jp, helium_network.jhe4, helium_network.jc12, helium_network.jo16, helium_network.jne20, helium_network.jne21, helium_network.jna23, helium_network.jmg24, helium_network.jal27,  helium_network.jsi28, helium_network.js32,  helium_network.jar36,  helium_network.jca40]
+#species = [nuclear_network.jp, nuclear_network.jhe4, nuclear_network.jc12, nuclear_network.jo16, nuclear_network.jne20, nuclear_network.jne21, nuclear_network.jna23, nuclear_network.jmg24, nuclear_network.jal27,  nuclear_network.jsi28, nuclear_network.js32,  nuclear_network.jar36,  nuclear_network.jca40]
 
 # Plot alpha chain (+ p) isotopes only 
-species = [helium_network.jp, helium_network.jhe4, helium_network.jc12, helium_network.jo16, helium_network.jne20, helium_network.jmg24,  helium_network.jsi28, helium_network.js32,  helium_network.jar36,  helium_network.jca40]
+species = [nuclear_network.jp, nuclear_network.jhe4, nuclear_network.jc12, nuclear_network.jo16, nuclear_network.jne20, nuclear_network.jmg24,  nuclear_network.jsi28, nuclear_network.js32,  nuclear_network.jar36,  nuclear_network.jca40]
 
 solutions_array = np.array(solutions).T  # Transpose to match the expected shape
 times_array = np.array  (times)
@@ -318,7 +318,7 @@ ax.set_ylim(1.e-8, 1.0)
 
 # Iterate over isotopes, converting betweeen Y and X by multiplying by A
 for i in species:
-    ax.loglog(times_array, solutions_array [i,:] * helium_network.A[i], label=f"X({helium_network.names[i].capitalize()})")
+    ax.loglog(times_array, solutions_array [i,:] * nuclear_network.A[i], label=f"X({nuclear_network.names[i].capitalize()})")
 
 if (invert):
     plt.title(fr"Isobaric Self-Heating Network, $P = {aux.float_to_latex_scientific(pres)}\, \mathrm{{dyne}}\ \mathrm{{cm}}^{{-2}}$, $T_0 = {aux.float_to_latex_scientific(T_init)}\ $ K") # using f strings
@@ -349,12 +349,12 @@ ax_left.set_ylabel('Critical length (cm)')
 ax_right = ax_left.twinx()
 
 # Plotting proton abundances on the right y-axis
-ax_right.plot(times, solutions_array[helium_network.jp, :], 'r')  # 'r' for red line, change as needed
+ax_right.plot(times, solutions_array[nuclear_network.jp, :], 'r')  # 'r' for red line, change as needed
 #ax_right.set_yscale('log')
 #ax_right.set_ylim(1.e-8, 1.e-4)
 # Dynamically adjust the second y-axis limits based on the maximum and minimum values of the proton abundance; switch from log to linear scale if the dynamic range is too small
-xpmax = np.max(solutions_array[helium_network.jp, :])
-xpmin = np.min(solutions_array[helium_network.jp, :])
+xpmax = np.max(solutions_array[nuclear_network.jp, :])
+xpmin = np.min(solutions_array[nuclear_network.jp, :])
 if (xpmin < 1.e-2 * xpmax):
     roundxpmax = 10**(round (math.log10 (xpmax) ) )
     ax_right.set_ylim(1.e-4 * roundxpmax, roundxpmax)
