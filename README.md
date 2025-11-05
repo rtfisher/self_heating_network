@@ -1,7 +1,7 @@
 # PYNUCDET:PYNUCastro Detonation Estimation Tool
 
 [![Pytest Workflow](https://github.com/rtfisher/self_heating_network/actions/workflows/pytest_workflow.yml/badge.svg)](https://github.com/rtfisher/self_heating_network/actions/workflows/pytest_workflow.yml)
-[![Python Version](https://img.shields.io/badge/python-3.8%20%7C%203.9%20%7C%203.10%20%7C%203.11-blue)](https://www.python.org/downloads/)
+[![Python Version](https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12-blue)](https://www.python.org/downloads/)
 [![License](https://img.shields.io/badge/license-GPL-green.svg)](LICENSE.txt)
 
 PYNUCDET does a self-heating nuclear network calculation for either constant
