@@ -188,8 +188,7 @@ class TestHelmholtzWithTestData:
 
     def test_helmholtz_test_data(self, helmholtz_executable, test_data_files):
         """Test that Helmholtz returns expected values from test data files"""
-        input_file_path = 'helm_input_test_data.txt'
-        output_file_path = 'helm_output_test_data.txt'
+        input_file_path, output_file_path = test_data_files
 
         with open(input_file_path, 'r') as file1, open(output_file_path, 'r') as file2:
             for line1, line2 in zip(file1, file2):
