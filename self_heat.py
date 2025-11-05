@@ -42,7 +42,14 @@ from scipy.integrate import solve_ivp
 from mpl_toolkits.axes_grid1.inset_locator import inset_axes
 import aux # auxilliary module for additional code
 import sys
-import self_heat_gui as gui # GUI module for isotope selection
+
+# GUI module for isotope selection (optional - only imported when --gui flag is used)
+try:
+    import self_heat_gui as gui
+    GUI_AVAILABLE = True
+except ImportError:
+    GUI_AVAILABLE = False
+    gui = None
 
 parser = argparse.ArgumentParser(description="Self-heating nuclear reaction network script.")
 
@@ -115,6 +122,10 @@ library = pyna.ReacLibLibrary()
 
 # Define the isotopes to be included in the network using a GUI
 if args.gui:
+  if not GUI_AVAILABLE:
+    print("Error: GUI requested but PyQt5 is not installed.")
+    print("Please install PyQt5 with: pip install PyQt5")
+    sys.exit(1)
   app = gui.QApplication(sys.argv)
   ex = gui.IsotopeSelector()
   ex.show()

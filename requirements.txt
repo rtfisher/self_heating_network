@@ -27,8 +27,6 @@ pure-eval==0.2.2
 Pygments==2.17.2
 pynucastro==2.2.0
 pyparsing==3.1.1
-PyQt5>=5.15.10
-PyQt5-sip>=12.13.0
 python-dateutil==2.8.2
 scipy==1.12.0
 six==1.16.0
