@@ -1,5 +1,9 @@
 import pytest
 import numpy as np
+import sys
+import os
+# Add parent directory to path to import modules
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import aux
 import subprocess
 from unittest.mock import patch, MagicMock

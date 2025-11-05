@@ -1,7 +1,10 @@
 import pytest
 import os
+import sys
 import tempfile
 import shutil
+# Add parent directory to path to import modules
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from cleanup import clean_up_specific_files
 
 # Test functions for cleanup.py module

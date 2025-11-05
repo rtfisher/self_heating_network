@@ -1,9 +1,14 @@
 import pytest
 import subprocess
 import os
+import sys
 import numpy as np
 import tempfile
 import shutil
+
+# Get the project root directory
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+SELF_HEAT_PATH = os.path.join(PROJECT_ROOT, 'self_heat.py')
 
 # Integration tests for self_heat.py script
 
@@ -25,7 +30,7 @@ class TestSelfHeatIntegration:
     def test_help_option(self):
         """Test that --help option works"""
         result = subprocess.run(
-            ['python', 'self_heat.py', '--help'],
+            ['python', SELF_HEAT_PATH, '--help'],
             capture_output=True,
             text=True
         )
@@ -35,7 +40,7 @@ class TestSelfHeatIntegration:
     def test_isochoric_short_run(self):
         """Test basic isochoric run with minimal parameters"""
         result = subprocess.run(
-            ['python', 'self_heat.py', '--isochoric', '-rho', '1e5', '-T', '1e9', '-tmax', '0.001'],
+            ['python', SELF_HEAT_PATH, '--isochoric', '-rho', '1e5', '-T', '1e9', '-tmax', '0.001'],
             capture_output=True,
             text=True,
             timeout=60
@@ -46,7 +51,7 @@ class TestSelfHeatIntegration:
     def test_isobaric_short_run(self):
         """Test basic isobaric run with minimal parameters"""
         result = subprocess.run(
-            ['python', 'self_heat.py', '--isobaric', '-rho', '1e5', '-T', '1e9', '-tmax', '0.001'],
+            ['python', SELF_HEAT_PATH, '--isobaric', '-rho', '1e5', '-T', '1e9', '-tmax', '0.001'],
             capture_output=True,
             text=True,
             timeout=60
@@ -57,7 +62,7 @@ class TestSelfHeatIntegration:
     def test_default_mode(self):
         """Test default mode (should be isochoric)"""
         result = subprocess.run(
-            ['python', 'self_heat.py', '-tmax', '0.001'],
+            ['python', SELF_HEAT_PATH, '-tmax', '0.001'],
             capture_output=True,
             text=True,
             timeout=60
@@ -68,7 +73,7 @@ class TestSelfHeatIntegration:
     def test_custom_density_temperature(self):
         """Test with custom density and temperature"""
         result = subprocess.run(
-            ['python', 'self_heat.py', '--isochoric', '-rho', '1e6', '-T', '5e8', '-tmax', '0.001'],
+            ['python', SELF_HEAT_PATH, '--isochoric', '-rho', '1e6', '-T', '5e8', '-tmax', '0.001'],
             capture_output=True,
             text=True,
             timeout=60
@@ -80,7 +85,7 @@ class TestSelfHeatIntegration:
     def test_custom_abundances(self):
         """Test with custom initial abundances"""
         result = subprocess.run(
-            ['python', 'self_heat.py', '--isochoric',
+            ['python', SELF_HEAT_PATH, '--isochoric',
              '-xp', '0.1', '-xhe4', '0.7', '-xc12', '0.15', '-xo16', '0.05',
              '-tmax', '0.001'],
             capture_output=True,
@@ -92,7 +97,7 @@ class TestSelfHeatIntegration:
     def test_invalid_abundances_sum(self):
         """Test that invalid abundance sum (not equal to 1) is rejected"""
         result = subprocess.run(
-            ['python', 'self_heat.py', '--isochoric',
+            ['python', SELF_HEAT_PATH, '--isochoric',
              '-xp', '0.1', '-xhe4', '0.6', '-xc12', '0.2', '-xo16', '0.2',  # Sum = 1.1
              '-tmax', '0.001'],
             capture_output=True,
@@ -106,7 +111,7 @@ class TestSelfHeatIntegration:
     def test_output_files_created(self):
         """Test that expected output files are created"""
         result = subprocess.run(
-            ['python', 'self_heat.py', '--isochoric', '-tmax', '0.001'],
+            ['python', SELF_HEAT_PATH, '--isochoric', '-tmax', '0.001'],
             capture_output=True,
             text=True,
             timeout=60
@@ -121,7 +126,7 @@ class TestSelfHeatIntegration:
     def test_detonation_lengths_data_file(self):
         """Test that detonation_lengths.dat is created and formatted correctly"""
         result = subprocess.run(
-            ['python', 'self_heat.py', '--isochoric',
+            ['python', SELF_HEAT_PATH, '--isochoric',
              '-xhe4', '0.8', '-xc12', '0.1', '-xo16', '0.1',
              '-rho', '1e5', '-T', '1e9', '-tmax', '0.001'],
             capture_output=True,
@@ -147,7 +152,7 @@ class TestSelfHeatIntegration:
     def test_runtime_display(self):
         """Test that runtime information is displayed"""
         result = subprocess.run(
-            ['python', 'self_heat.py', '--isochoric', '-tmax', '0.001'],
+            ['python', SELF_HEAT_PATH, '--isochoric', '-tmax', '0.001'],
             capture_output=True,
             text=True,
             timeout=60
@@ -166,7 +171,7 @@ class TestSelfHeatNumerics:
     def test_low_temperature_run(self):
         """Test behavior at low temperatures (minimal nuclear burning)"""
         result = subprocess.run(
-            ['python', 'self_heat.py', '--isochoric', '-T', '1e7', '-tmax', '0.001'],
+            ['python', SELF_HEAT_PATH, '--isochoric', '-T', '1e7', '-tmax', '0.001'],
             capture_output=True,
             text=True,
             timeout=60
@@ -177,7 +182,7 @@ class TestSelfHeatNumerics:
     def test_high_temperature_run(self):
         """Test behavior at high temperatures (rapid burning)"""
         result = subprocess.run(
-            ['python', 'self_heat.py', '--isochoric', '-T', '2e9', '-tmax', '0.0001'],
+            ['python', SELF_HEAT_PATH, '--isochoric', '-T', '2e9', '-tmax', '0.0001'],
             capture_output=True,
             text=True,
             timeout=60
@@ -188,7 +193,7 @@ class TestSelfHeatNumerics:
     def test_low_density_run(self):
         """Test behavior at low densities"""
         result = subprocess.run(
-            ['python', 'self_heat.py', '--isochoric', '-rho', '1e3', '-tmax', '0.001'],
+            ['python', SELF_HEAT_PATH, '--isochoric', '-rho', '1e3', '-tmax', '0.001'],
             capture_output=True,
             text=True,
             timeout=60
@@ -199,7 +204,7 @@ class TestSelfHeatNumerics:
         """Test that adaptive timestepping works (check for 'Halving timestep' message)"""
         # Use conditions likely to trigger timestep reduction
         result = subprocess.run(
-            ['python', 'self_heat.py', '--isochoric', '-T', '2e9', '-tmax', '0.01'],
+            ['python', SELF_HEAT_PATH, '--isochoric', '-T', '2e9', '-tmax', '0.01'],
             capture_output=True,
             text=True,
             timeout=120
@@ -216,7 +221,7 @@ class TestSelfHeatPureCompositions:
     def test_pure_helium(self):
         """Test with pure helium composition"""
         result = subprocess.run(
-            ['python', 'self_heat.py', '--isochoric',
+            ['python', SELF_HEAT_PATH, '--isochoric',
              '-xp', '0.0', '-xhe4', '1.0', '-xc12', '0.0', '-xo16', '0.0',
              '-tmax', '0.001'],
             capture_output=True,
@@ -228,7 +233,7 @@ class TestSelfHeatPureCompositions:
     def test_carbon_oxygen_mixture(self):
         """Test with C/O mixture (no helium)"""
         result = subprocess.run(
-            ['python', 'self_heat.py', '--isochoric',
+            ['python', SELF_HEAT_PATH, '--isochoric',
              '-xp', '0.0', '-xhe4', '0.0', '-xc12', '0.5', '-xo16', '0.5',
              '-tmax', '0.001'],
             capture_output=True,
