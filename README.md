@@ -1,5 +1,10 @@
-# PYNUCDET:PYNUCastro Detonation Estimation Tool 
- PYNUCDET does a self-heating nuclear network calculation for either constant
+# PYNUCDET:PYNUCastro Detonation Estimation Tool
+
+[![Pytest Workflow](https://github.com/rtfisher/self_heating_network/actions/workflows/pytest_workflow.yml/badge.svg)](https://github.com/rtfisher/self_heating_network/actions/workflows/pytest_workflow.yml)
+[![Python Version](https://img.shields.io/badge/python-3.8%20%7C%203.9%20%7C%203.10%20%7C%203.11-blue)](https://www.python.org/downloads/)
+[![License](https://img.shields.io/badge/license-GPL-green.svg)](LICENSE.txt)
+
+PYNUCDET does a self-heating nuclear network calculation for either constant
  volume (isochoric) or constant pressure (isobaric) conditions using Mike Zingale's 
  pynucastro for nuclear reaction rates and compositions, scipy.integrate for 
  integration method, and Frank Timmes's Helmholtz equation of state for the speed
@@ -93,7 +98,35 @@
    
    `-tmax TMAX   Simulation evolutionary time (in seconds).`
 
- # References 
+# Testing
+
+A comprehensive test suite is included with 60+ test cases covering all major components. Tests are automatically run via GitHub Actions on every push and pull request.
+
+## Running Tests
+
+Install test dependencies:
+```bash
+pip install pytest pytest-cov pytest-timeout pytest-xdist
+```
+
+Run all tests:
+```bash
+pytest
+```
+
+Run with coverage report:
+```bash
+pytest --cov=. --cov-report=html
+```
+
+Run only fast tests (exclude slow integration tests):
+```bash
+pytest -m "not slow"
+```
+
+For more details, see [TESTING.md](TESTING.md) and [QUICK_START_TESTING.md](QUICK_START_TESTING.md).
+
+# References 
  
  Poloudnenko, Gardiner, & Oran's 2011 PRL: https://arxiv.org/abs/1106.3696
  

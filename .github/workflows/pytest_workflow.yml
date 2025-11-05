@@ -2,37 +2,110 @@ name: Pytest Workflow
 
 on:
   push:
-    branches: [ main ]  # Replace 'main' with your default branch if different
+    branches: [ main ]  # Runs on push to main branch
+  pull_request:
+    branches: [ main ]  # Runs on pull requests to main
   schedule:
     - cron: '0 0 * * *'  # Runs at 00:00 UTC every day
+  workflow_dispatch:  # Allows manual triggering
 
 jobs:
   build_and_test:
     runs-on: ubuntu-latest  # Specifies the runner environment
+    strategy:
+      matrix:
+        python-version: ['3.8', '3.9', '3.10', '3.11']  # Test on multiple Python versions
+      fail-fast: false  # Continue testing other versions even if one fails
 
     steps:
-    - uses: actions/checkout@v2  # Checks-out your repository
+    - name: Checkout repository
+      uses: actions/checkout@v3
 
-    - name: Set up Python
-      uses: actions/setup-python@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
       with:
-        python-version: '3.8'  # Specify the Python version
+        python-version: ${{ matrix.python-version }}
 
-    - name: Install dependencies
+    - name: Cache pip dependencies
+      uses: actions/cache@v3
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+
+    - name: Install system build dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y build-essential gfortran
+
+    - name: Install Python dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install pytest numpy
-        # If you have a requirements.txt file, uncomment the next line
-        # pip install -r requirements.txt
+        pip install pytest pytest-cov pytest-timeout pytest-xdist
+        pip install -r requirements.txt
 
-    - name: Install build dependencies
-      run: sudo apt-get update && sudo apt-get install -y build-essential gfortran
-
-    - name: Compile Helmholtz
+    - name: Compile Helmholtz EOS
       run: |
         cd _helmholtz
+        make clean
         make
+        cd ..
 
-    - name: Run pytest
-      run: pytest
+    - name: Verify Helmholtz executable
+      run: |
+        test -f _helmholtz/helmholtz.exe
+        _helmholtz/helmholtz.exe False 1.0e6 1.0e9 16.0 8.0
+
+    - name: Run unit tests with coverage
+      run: |
+        pytest test_aux.py test_cleanup.py test_self_heat.py -v --cov=. --cov-report=xml --cov-report=term
+
+    - name: Run integration tests
+      run: |
+        pytest test_self_heat_integration.py -v --timeout=300
+
+    - name: Run all tests with detailed output
+      run: |
+        pytest -v --tb=short --maxfail=5
+
+    - name: Upload coverage reports
+      if: matrix.python-version == '3.10'
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./coverage.xml
+        flags: unittests
+        name: codecov-umbrella
+        fail_ci_if_error: false
+
+    - name: Test cleanup script
+      run: |
+        python cleanup.py
+        test ! -f abundances.png || echo "abundances.png was not cleaned up"
+        test ! -f detonation_lengths.png || echo "detonation_lengths.png was not cleaned up"
+
+    - name: Archive test artifacts
+      if: always()
+      uses: actions/upload-artifact@v3
+      with:
+        name: test-outputs-py${{ matrix.python-version }}
+        path: |
+          *.png
+          *.dat
+          coverage.xml
+        retention-days: 7
+
+  test-coverage-report:
+    runs-on: ubuntu-latest
+    needs: build_and_test
+    if: always()
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Generate coverage summary
+      run: |
+        echo "## Test Coverage Summary" >> $GITHUB_STEP_SUMMARY
+        echo "Coverage reports have been generated and uploaded." >> $GITHUB_STEP_SUMMARY
 
