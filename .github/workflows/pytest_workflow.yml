@@ -37,7 +37,12 @@ jobs:
     - name: Install system build dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y build-essential gfortran
+        sudo apt-get install -y build-essential gfortran \
+          libqt5gui5 libqt5widgets5 libqt5core5a \
+          qt5-qmake qtbase5-dev \
+          xvfb x11-utils libxkbcommon-x11-0 libxcb-icccm4 \
+          libxcb-image0 libxcb-keysyms1 libxcb-randr0 \
+          libxcb-render-util0 libxcb-xinerama0 libxcb-xfixes0
 
     - name: Install Python dependencies
       run: |
@@ -60,17 +65,20 @@ jobs:
     - name: Run unit tests with coverage
       run: |
         export PYTHONPATH="${PYTHONPATH}:$(pwd)"
-        pytest _testing/test_aux.py _testing/test_cleanup.py _testing/test_self_heat.py -v --cov=. --cov-report=xml --cov-report=term
+        export QT_QPA_PLATFORM=offscreen
+        xvfb-run -a pytest _testing/test_aux.py _testing/test_cleanup.py _testing/test_self_heat.py -v --cov=. --cov-report=xml --cov-report=term
 
     - name: Run integration tests
       run: |
         export PYTHONPATH="${PYTHONPATH}:$(pwd)"
-        pytest _testing/test_self_heat_integration.py -v --timeout=300
+        export QT_QPA_PLATFORM=offscreen
+        xvfb-run -a pytest _testing/test_self_heat_integration.py -v --timeout=300
 
     - name: Run all tests with detailed output
       run: |
         export PYTHONPATH="${PYTHONPATH}:$(pwd)"
-        pytest -v --tb=short --maxfail=5
+        export QT_QPA_PLATFORM=offscreen
+        xvfb-run -a pytest -v --tb=short --maxfail=5
 
     - name: Upload coverage reports
       if: matrix.python-version == '3.10'
@@ -89,7 +97,7 @@ jobs:
 
     - name: Archive test artifacts
       if: always()
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: test-outputs-py${{ matrix.python-version }}
         path: |
