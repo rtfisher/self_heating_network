@@ -124,7 +124,7 @@ Run only fast tests (exclude slow integration tests):
 pytest -m "not slow"
 ```
 
-For more details, see [TESTING.md](TESTING.md) and [QUICK_START_TESTING.md](QUICK_START_TESTING.md).
+For more details, see [TESTING.md](_testing/TESTING.md) and [QUICK_START_TESTING.md](_testing/QUICK_START_TESTING.md).
 
 # References 
  

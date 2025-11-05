@@ -59,14 +59,17 @@ jobs:
 
     - name: Run unit tests with coverage
       run: |
-        pytest test_aux.py test_cleanup.py test_self_heat.py -v --cov=. --cov-report=xml --cov-report=term
+        export PYTHONPATH="${PYTHONPATH}:$(pwd)"
+        pytest _testing/test_aux.py _testing/test_cleanup.py _testing/test_self_heat.py -v --cov=. --cov-report=xml --cov-report=term
 
     - name: Run integration tests
       run: |
-        pytest test_self_heat_integration.py -v --timeout=300
+        export PYTHONPATH="${PYTHONPATH}:$(pwd)"
+        pytest _testing/test_self_heat_integration.py -v --timeout=300
 
     - name: Run all tests with detailed output
       run: |
+        export PYTHONPATH="${PYTHONPATH}:$(pwd)"
         pytest -v --tb=short --maxfail=5
 
     - name: Upload coverage reports
