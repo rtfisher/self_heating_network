@@ -36,6 +36,8 @@
 import datetime, argparse, math
 import pynucastro as pyna
 from pynucastro.neutrino_cooling import sneut5
+import matplotlib
+matplotlib.use('Agg')  # Use non-interactive backend for headless environments
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy.integrate import solve_ivp
