@@ -154,13 +154,14 @@ class TestFloatToLatexScientific:
 
     def test_precision_control(self):
         """Test precision parameter control"""
-        value = 1234.5
+        # Use value within plain number range [0.01, 99.99] to test precision
+        value = 12.3456
 
         result_1 = aux.float_to_latex_scientific(value, precision=1)
-        assert "1234.5" in result_1
+        assert "12.3" in result_1
 
         result_2 = aux.float_to_latex_scientific(value, precision=2)
-        assert "1234.50" in result_2
+        assert "12.35" in result_2
 
     def test_negative_numbers(self):
         """Test conversion of negative numbers"""
