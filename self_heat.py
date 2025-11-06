@@ -191,8 +191,8 @@ X0 [nuclear_network.jo16] = xo16_init
 Y0 = X0 / nuclear_network.A
 
 # Calculate abar and zbar
-abar = comp.abar
-zbar = comp.zbar
+abar = comp.eval_abar()
+zbar = comp.eval_zbar()
 
 # For isobaric conditions, define a constant pressure by an initial call to Helmholtz
 #  using the initial density and temperature and composition.
@@ -240,8 +240,8 @@ while t < tmax:
         comp.set_nuc(isotope, sol.y [index, n] * nuclear_network.A [index])
 
     # Update abar and zbar
-    abar = comp.abar
-    zbar = comp.zbar
+    abar = comp.eval_abar()
+    zbar = comp.eval_zbar()
 
 # Calculate the specific neutrino loss rate
     snu = sneut5 (rho, T, comp) # erg / g / s
