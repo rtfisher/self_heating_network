@@ -100,7 +100,7 @@ PYNUCDET does a self-heating nuclear network calculation for either constant
 
 # Testing
 
-A comprehensive test suite is included with 60+ test cases covering all major components. Tests are automatically run via GitHub Actions on every push and pull request.
+A comprehensive test suite is included with 60+ test cases covering all major components, including unit tests for individual functions and integration tests for complete simulation workflows. Tests are automatically run via GitHub Actions on every push and pull request. Integration tests use a minimal 7-isotope network (via the `--test` flag) for faster execution, while the full 59-isotope network is available for production runs.
 
 ## Running Tests
 
