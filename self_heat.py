@@ -79,6 +79,9 @@ parser.add_argument("--cppnet", action="store_true", help="Generate a C++ networ
 # Add flag for GUI isotope selection
 parser.add_argument("--gui", action="store_true", help="Select isotopes using a GUI.")
 
+# Add flag for using a smaller test network (alpha chain)
+parser.add_argument("--test", action="store_true", help="Use smaller 13-isotope alpha chain network for faster testing.")
+
 # Parse the arguments
 args = parser.parse_args()
 
@@ -122,7 +125,7 @@ else:
 # Initialize the pynucastro reaction library
 library = pyna.ReacLibLibrary()
 
-# Define the isotopes to be included in the network using a GUI
+# Define the isotopes to be included in the network
 if args.gui:
   if not GUI_AVAILABLE:
     print("Error: GUI requested but PyQt5 is not installed.")
@@ -133,7 +136,14 @@ if args.gui:
   ex.show()
   result = app.exec_()
   isotope_list = ex.selected_isotopes  # Access the selected isotopes after the window is closed
-else: # use the full network by default
+elif args.test:
+  # Use minimal test network (just enough isotopes for basic testing)
+  # This is MUCH faster for testing purposes - only 7 isotopes
+  isotope_list = [
+            "p", "n", "he4", "c12", "o16", "ne20", "mg24"
+           ]
+else:
+  # Use the full network by default
   isotope_list = [
             "p", "n", "he4", "b11", "c12", "c13", "n13", "n14",
             "n15", "o15", "o16", "o17", "f18", "ne19",
