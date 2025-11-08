@@ -100,7 +100,7 @@ PYNUCDET does a self-heating nuclear network calculation for either constant
 
 # Testing
 
-A comprehensive test suite is included with 60+ test cases covering all major components, including unit tests for Helmholtz EOS calls and utility functions, and integration tests for isochoric/isobaric simulation workflows, output file generation, and custom density/temperature/composition scenarios. Tests are automatically run via GitHub Actions on every push and pull request. Integration tests use a minimal 7-isotope network (via the `--test` flag) for faster execution, while the full 59-isotope network is available for production runs.
+A comprehensive test suite is included with 60+ test cases covering all major components, including unit tests for Helmholtz EOS calls and utility functions, and integration tests for isochoric/isobaric simulation workflows, output file generation, and custom density/temperature/composition scenarios. Tests are automatically run via GitHub Actions on every push and pull request. Integration tests use a minimal 7-isotope network (via the `--test` flag) for faster execution, while a larger network is available for production runs.
 
 ## Running Tests
 
