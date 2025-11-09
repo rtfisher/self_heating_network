@@ -217,8 +217,9 @@ if (invert):
 # Set limits of time integration and initial timestep dt
 t    = 0.
 accumulated_time = 0  # Initialize an accumulated time counter
-tmax = args.tmax  
+tmax = args.tmax
 dt   = 1.e-3 * tmax # Initial timestep, scaled by tmax
+dt_min = 1.e-15  # Minimum allowed timestep (seconds) - prevents infinite loop from repeated halving
 dt_plot = tmax / 10  # Plot network flows  every dt_plot, scaled by tmax
 
 # Initialize lists for data storage; the lists will be appended to at each timestep so that they always have a length appropriate for the number of timesteps.
@@ -287,25 +288,44 @@ while t < tmax:
 
     T += dT
 
+    # FIX: For isobaric runs, recalculate EOS at NEW temperature before using thermodynamic properties
+    # This ensures thermodynamic consistency: ρ(P, T_new) and maintains P=constant
+    # For isochoric runs, density is constant so no need to recalculate
+    if (invert):
+        # Re-call Helmholtz EOS with updated temperature to get state at constant pressure
+        rho, pres, eint_new, gammac, gammae, h, cs_new, cp, cv = aux.call_helmholtz(invert, rho, T, abar, zbar, pres)
+        # Use updated values for subsequent calculations
+        eint = eint_new
+        cs = cs_new
+
     # Calculate time derivative of number abundances dYdt
     dYdt = dY / dt
 
     # Calculate critical length and append to list
-    critical_lengths.append (eint / nuclear_network.energy_release(dYdt) * cs)
-    energies.append ( nuclear_network.energy_release(dYdt) )
+    # FIX: Protect against division by zero when nuclear burning rate is negligible
+    eps_nuc = nuclear_network.energy_release(dYdt)
+    if abs(eps_nuc) > 1.e-20:  # Significant burning occurring
+        critical_lengths.append(eint / eps_nuc * cs)
+    else:  # No significant burning → infinite critical length (detonation impossible)
+        critical_lengths.append(np.inf)
+    energies.append(eps_nuc)
 
     # Check if temperature increment is too large
     if abs(dT / T_initial) > 0.01:
         # Halve the time step and redo the step
+        # FIX: Check that timestep doesn't fall below minimum to prevent infinite loop
+        if dt < 2.0 * dt_min:
+            print(f"ERROR: Timestep {dt:.2e} s below minimum {dt_min:.2e} s at t={t:.2e} s")
+            print(f"  Temperature: T={T:.2e} K, dT/T={abs(dT/T_initial):.2e}")
+            print(f"  Cannot converge with current tolerance. Simulation terminated.")
+            sys.exit(1)
         print ("Halving timestep due to large temperature increment")
-        dt /= 2.0 # Need to check that dt is not too small
+        dt /= 2.0
         Y0 = Y0_initial
         T = T_initial
         continue # skip rest of loop, return to while; isobaric retains rho
 
-    # Solution is ok; update the density as well for isobaric conditions
-    if (invert):
-        rho = dens       #update density from EOS call
+    # Solution is ok; density already updated for isobaric conditions above
 
     # Update time and initial condition for the next iteration
     t = sol.t[-1]
@@ -335,11 +355,14 @@ ax.set_ylim(1.e-8, 1.0)
 ax.set_xlabel("t (s)")
 ax.set_ylabel("X")
 
-# Isotopes to plot
-#species = [nuclear_network.jp, nuclear_network.jhe4, nuclear_network.jc12, nuclear_network.jo16, nuclear_network.jne20, nuclear_network.jne21, nuclear_network.jna23, nuclear_network.jmg24, nuclear_network.jal27,  nuclear_network.jsi28, nuclear_network.js32,  nuclear_network.jar36,  nuclear_network.jca40]
-
-# Plot alpha chain (+ p) isotopes only 
-species = [nuclear_network.jp, nuclear_network.jhe4, nuclear_network.jc12, nuclear_network.jo16, nuclear_network.jne20, nuclear_network.jmg24,  nuclear_network.jsi28, nuclear_network.js32,  nuclear_network.jar36,  nuclear_network.jca40]
+# Isotopes to plot - dynamically build list based on what exists in the network
+# Try to plot alpha chain isotopes, but only include those that exist in the current network
+alpha_chain_isotopes = ['p', 'he4', 'c12', 'o16', 'ne20', 'mg24', 'si28', 's32', 'ar36', 'ca40']
+species = []
+for isotope in alpha_chain_isotopes:
+    isotope_attr = 'j' + isotope
+    if hasattr(nuclear_network, isotope_attr):
+        species.append(getattr(nuclear_network, isotope_attr))
 
 solutions_array = np.array(solutions).T  # Transpose to match the expected shape
 times_array = np.array  (times)
@@ -416,14 +439,16 @@ inset_ax = inset_axes(plt.gca(), width="25%", height="25%", loc='lower left',
                       bbox_to_anchor=(0.25, 0.15, 1, 1), bbox_transform=plt.gca().transAxes)
 
 # Plotting on the inset axes
-inset_ax.loglog(times_array, np.log10(energies_array), 'r-')  # 'r-' for red line, change as needed
+# FIX: Remove np.log10() - loglog already takes logarithm of both axes
+# Previously plotted log(log(eps_nuc)) instead of log(eps_nuc)
+inset_ax.loglog(times_array, energies_array, 'r-')  # 'r-' for red line, change as needed
 
 # Make the inset plot partially transparent
 inset_ax.patch.set_alpha(0.5)  # Adjust alpha for transparency, 0 is fully transparent, 1 is opaque
 
 # labels for the inset plot
 inset_ax.set_xlabel('Time (s)')
-inset_ax.set_ylabel(r'log ($\epsilon_{\rm nuc}$)')
+inset_ax.set_ylabel(r'$\epsilon_{\rm nuc}$ (erg g$^{-1}$ s$^{-1}$)')
 
 fig.savefig("detonation_lengths.png", dpi=300)
 

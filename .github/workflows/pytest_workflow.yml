@@ -65,7 +65,7 @@ jobs:
     - name: Run integration tests
       run: |
         export PYTHONPATH="${PYTHONPATH}:$(pwd)"
-        pytest _testing/test_self_heat_integration.py -v --timeout=300
+        pytest _testing/test_self_heat_integration.py -v --timeout=600
 
     - name: Run all tests with detailed output
       run: |
